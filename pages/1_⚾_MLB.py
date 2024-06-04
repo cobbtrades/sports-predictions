@@ -141,8 +141,8 @@ def scrape_games():
         return [], str(e)
     return games, None
 
-@st.cache_data
-def load_data():
+# Main processing and model training function
+def generate_predictions():
     # Fetch and process data
     bat_data = []
     for team in teams:
@@ -179,13 +179,7 @@ def load_data():
     odds_full = pd.concat([odds1, odds2])
     odds_full['date'] = pd.to_datetime(odds_full['date'])
 
-    return df1, df2, odds_full
-
-def generate_predictions():
-    df1, df2, odds_full = load_data()
-
     # Merge and preprocess data
-    df_full = pd.concat([df1, df2])
     odds1_home = odds_full.rename(columns={'home_ml': 'Tm_ml', 'away_ml': 'Opp_ml',})
     odds1_away = odds_full.rename(columns={'home_ml': 'Opp_ml', 'away_ml': 'Tm_ml',})
     merged_home = pd.merge(df_full[df_full['Home']], odds1_home, left_on=['Date', 'Tm'], right_on=['date', 'home_team_abbr'], how='left')
