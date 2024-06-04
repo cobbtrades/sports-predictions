@@ -254,7 +254,15 @@ def generate_predictions():
     display_df['Winner Odds'] = display_df.apply(lambda row: row['Home Odds'] if row['Predicted Winner'] == row['Home Team'] else row['Away Odds'], axis=1)
     display_df['Winner Odds'] = display_df['Winner Odds'].astype(float).astype(int)
 
-    st.dataframe(display_df)
+    st.dataframe(display_df.style
+             .hide(axis='index')
+             .applymap(lambda x: 'color: orange;', subset=['Matchup'])
+             .applymap(lambda x: 'color: green;', subset=['Predicted Winner'])
+             .applymap(lambda x: 'color: blue;', subset=['Winner Odds'])
+             .set_table_styles([{
+                 'selector': 'th',
+                 'props': [('color', 'white'), ('background-color', 'black')]
+             }]))
 
 # Display spinner while processing
 with st.spinner('Generating predictions...'):
