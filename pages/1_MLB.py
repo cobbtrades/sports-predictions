@@ -1,7 +1,6 @@
 import streamlit as st
 import requests, pandas as pd, time, numpy as np, pickle, re, json
 from datetime import datetime, timedelta
-from IPython.display import display, HTML
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
