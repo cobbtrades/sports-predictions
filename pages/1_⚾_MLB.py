@@ -22,7 +22,6 @@ st.markdown("""
 Here are the latest predictions for MLB games.
 """)
 
-# Function definitions (same as before)
 # Define the teams and mappings
 sport_dict = {"MLB": "mlb-baseball"}
 teams = ['ARI','ATL','BAL','BOS','CHC','CHW','CIN','CLE','COL','DET','HOU','KCR','LAA','LAD','MIA','MIL','MIN','NYM','NYY','OAK','PHI','PIT','SDP','SEA','SFG','STL','TBR','TEX','TOR','WSN']
@@ -74,6 +73,74 @@ def fetch_and_process_pitching_data(team, year):
     pit_df.rename(columns={col: f'p{col}' for col in pit_pre}, inplace=True)
     return pit_df
 
+def daterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days)):
+        yield start_date + timedelta(n)
+
+def fetch_fanduel_mlb_odds(date):
+    sport = "MLB"
+    date_str = date.strftime("%Y-%m-%d")
+    spread_url = f"https://www.sportsbookreview.com/betting-odds/{sport_dict[sport]}/?date={date_str}"
+    r = requests.get(spread_url)
+    j = re.findall('__NEXT_DATA__" type="application/json">(.*?)</script>', r.text)
+    if not j:
+        return []
+    build_id = json.loads(j[0])['buildId']
+    odds_url = f"https://www.sportsbookreview.com/_next/data/{build_id}/betting-odds/{sport_dict[sport]}/money-line/full-game.json?league={sport_dict[sport]}&oddsType=money-line&oddsScope=full-game&date={date_str}"
+    odds_json = requests.get(odds_url).json()
+    if 'oddsTables' in odds_json['pageProps'] and odds_json['pageProps']['oddsTables']:
+        games_list = odds_json['pageProps']['oddsTables'][0]['oddsTableModel']['gameRows']
+    else:
+        return []
+    fanduel_games = []
+    for game in games_list:
+        if game['oddsViews']:
+            for odds_view in game['oddsViews']:
+                if odds_view and odds_view.get('sportsbook', '').lower() == 'fanduel':
+                    game_data = {
+                        'date': game['gameView']['startDate'],
+                        'home_team_abbr': game['gameView']['homeTeam']['shortName'],
+                        'away_team_abbr': game['gameView']['awayTeam']['shortName'],
+                        'home_ml': odds_view['currentLine'].get('homeOdds', 'N/A'),
+                        'away_ml': odds_view['currentLine'].get('awayOdds', 'N/A')
+                    }
+                    fanduel_games.append(game_data)
+                    break
+    return fanduel_games
+
+def scrape_games():
+    date = datetime.today().strftime("%Y-%m-%d")
+    spread_url = f"https://www.sportsbookreview.com/betting-odds/mlb-baseball/?date={date}"
+    r = requests.get(spread_url)
+    try:
+        build_id = json.loads(re.findall('__NEXT_DATA__" type="application/json">(.*?)</script>', r.text)[0])['buildId']
+        moneyline_url = f"https://www.sportsbookreview.com/_next/data/{build_id}/betting-odds/mlb-baseball/money-line/full-game.json?league=mlb-baseball&oddsType=money-line&oddsScope=full-game&date={date}"
+        moneyline_json = requests.get(moneyline_url).json()
+        games = []
+        for g in moneyline_json['pageProps']['oddsTables'][0]['oddsTableModel']['gameRows']:
+            game = {
+                'date': g['gameView']['startDate'],
+                'home_team_abbr': g['gameView']['homeTeam']['shortName'],
+                'away_team_abbr': g['gameView']['awayTeam']['shortName'],
+                'home_ml': None,
+                'away_ml': None,
+                'TmStart': 'TBD',
+                'OppStart': 'TBD'
+            }
+            if 'homeStarter' in g['gameView'] and g['gameView']['homeStarter']:
+                game['TmStart'] = g['gameView']['homeStarter'].get('firstInital', '') + "." + g['gameView']['homeStarter'].get('lastName', '')
+            if 'awayStarter' in g['gameView'] and g['gameView']['awayStarter']:
+                game['OppStart'] = g['gameView']['awayStarter'].get('firstInital', '') + "." + g['gameView']['awayStarter'].get('lastName', '')
+            for line in g['oddsViews']:
+                if line:
+                    game['home_ml'] = line['currentLine']['homeOdds']
+                    game['away_ml'] = line['currentLine']['awayOdds']
+                    break
+            games.append(game)
+    except Exception as e:
+        return [], str(e)
+    return games, None
+
 # Main processing and model training function
 def generate_predictions():
     # Fetch and process data
@@ -106,9 +173,9 @@ def generate_predictions():
     odds2['date'] = pd.to_datetime(odds2['date']).dt.date
 
     # Load and merge historical data
-    df1 = pd.read_pickle('mlbgamelogs22-23.pkl')
+    df1 = pd.read_pickle('data/mlbgamelogs22-23.pkl')
     df_full = pd.concat([df1, df2])
-    odds1 = pd.read_csv('mlbodds22-23.csv')[['date','home_team_abbr','away_team_abbr','home_ml','away_ml']]
+    odds1 = pd.read_csv('data/mlbodds22-23.csv')[['date','home_team_abbr','away_team_abbr','home_ml','away_ml']]
     odds1['date'] = pd.to_datetime(odds1['date']).dt.date
     odds_full = pd.concat([odds1, odds2])
     odds_full['date'] = pd.to_datetime(odds_full['date'])
