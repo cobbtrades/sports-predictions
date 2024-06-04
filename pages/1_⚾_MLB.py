@@ -141,8 +141,8 @@ def scrape_games():
         return [], str(e)
     return games, None
 
-# Main processing and model training function
-def generate_predictions():
+@st.cache_data
+def load_data():
     # Fetch and process data
     bat_data = []
     for team in teams:
@@ -173,14 +173,19 @@ def generate_predictions():
     odds2['date'] = pd.to_datetime(odds2['date']).dt.date
 
     # Load and merge historical data
-    df1 = pd.read_pickle('data/mlbgamelogs22-23.pkl')
-    df_full = pd.concat([df1, df2])
-    odds1 = pd.read_csv('data/mlbodds22-23.csv')[['date','home_team_abbr','away_team_abbr','home_ml','away_ml']]
+    df1 = pd.read_pickle('data/mlbgamelogs22-23.pkl')  # Updated path for the PKL file
+    odds1 = pd.read_csv('data/mlbodds22-23.csv')[['date','home_team_abbr','away_team_abbr','home_ml','away_ml']]  # Updated path for the CSV file
     odds1['date'] = pd.to_datetime(odds1['date']).dt.date
     odds_full = pd.concat([odds1, odds2])
     odds_full['date'] = pd.to_datetime(odds_full['date'])
 
+    return df1, df2, odds_full
+
+def generate_predictions():
+    df1, df2, odds_full = load_data()
+
     # Merge and preprocess data
+    df_full = pd.concat([df1, df2])
     odds1_home = odds_full.rename(columns={'home_ml': 'Tm_ml', 'away_ml': 'Opp_ml',})
     odds1_away = odds_full.rename(columns={'home_ml': 'Opp_ml', 'away_ml': 'Tm_ml',})
     merged_home = pd.merge(df_full[df_full['Home']], odds1_home, left_on=['Date', 'Tm'], right_on=['date', 'home_team_abbr'], how='left')
@@ -255,7 +260,15 @@ def generate_predictions():
     display_df['Winner Odds'] = display_df.apply(lambda row: row['Home Odds'] if row['Predicted Winner'] == row['Home Team'] else row['Away Odds'], axis=1)
     display_df['Winner Odds'] = display_df['Winner Odds'].astype(float).astype(int)
 
-    st.dataframe(display_df)
+    st.dataframe(display_df.style
+                 .hide(axis='index')
+                 .applymap(lambda x: 'color: orange;', subset=['Matchup'])
+                 .applymap(lambda x: 'color: green;', subset=['Predicted Winner'])
+                 .applymap(lambda x: 'color: blue;', subset=['Winner Odds'])
+                 .set_table_styles([{
+                     'selector': 'th',
+                     'props': [('color', 'white'), ('background-color', 'black')]
+                 }]))
 
 # Display spinner while processing
 with st.spinner('Generating predictions...'):
