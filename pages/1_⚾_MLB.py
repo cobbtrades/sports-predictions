@@ -199,20 +199,8 @@ def generate_predictions():
     df.fillna(method='bfill', inplace=True)
     df['total'] = df['R'] + df['pR']
 
-    # Split data and train model
-    X = df[['Home', 'Tm', 'Opp', 'TmStart', 'OppStart', 'Tm_ml', 'Opp_ml', 'avg_R', 'avg_H', 'avg_2B', 'avg_3B', 'avg_HR' ,'avg_RBI', 'avg_BB', 'avg_SO', 'avg_BA', 'avg_OBP', 'avg_pR', 'avg_pH', 'avg_p2B', 'avg_p3B', 'avg_pHR', 'avg_pBB', 'avg_pSO', 'avg_pERA']]
-    y = df['Rslt']
-    categorical_features = ['Tm', 'TmStart', 'Opp', 'OppStart']
-    categorical_transformer = Pipeline(steps=[('imputer', SimpleImputer(strategy='constant', fill_value='missing')),('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    preprocessor = ColumnTransformer(transformers=[('cat', categorical_transformer, categorical_features)])
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    model = Pipeline(steps=[('preprocessor', preprocessor),('classifier', RandomForestClassifier(random_state=42))])
-    param_grid = {'classifier__n_estimators': [100, 200],'classifier__max_depth': [None, 10, 20],'classifier__min_samples_split': [2, 5],'classifier__min_samples_leaf': [1, 2]}
-    grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy', verbose=1)
-    grid_search.fit(X_train, y_train)
-    best_model = grid_search.best_estimator_
-    y_pred = best_model.predict(X_test)
-    st.write('Test Accuracy:', accuracy_score(y_test, y_pred))
+    with open('best_model.pkl', 'rb') as f:
+        best_model = pickle.load(f)
 
     # Scrape today's games and predict outcomes
     games, error = scrape_games()
