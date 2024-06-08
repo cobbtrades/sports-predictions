@@ -199,7 +199,12 @@ def generate_predictions():
     df.fillna(method='bfill', inplace=True)
     df['total'] = df['R'] + df['pR']
 
-    with open('best_model.pkl', 'rb') as f:
+    url = 'https://drive.google.com/file/d/1poe29O4ucg0XuhsXUxPB-x-QgR0YYM2l/view?usp=drive_link'
+    output = 'best_model.pkl'
+    gdown.download(url, output, quiet=False)
+    
+    # Load the model
+    with open(output, 'rb') as f:
         best_model = pickle.load(f)
 
     # Scrape today's games and predict outcomes
