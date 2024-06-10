@@ -261,7 +261,6 @@ def generate_predictions():
 
     best_model = grid_search.best_estimator_
     y_pred = best_model.predict(X_test)
-    st.write('Test Accuracy:', accuracy_score(y_test, y_pred))
 
     games, error = scrape_games()
     if error:
@@ -320,7 +319,6 @@ def generate_predictions():
 
     return final_display_df
 
-st.title('MLB Predictions')
 st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
 
