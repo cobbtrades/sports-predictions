@@ -9,6 +9,14 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.impute import SimpleImputer
 import altair as alt
+import contextlib
+import io
+
+# Custom context manager to suppress Streamlit's internal messages
+@contextlib.contextmanager
+def suppress_stdout():
+    with io.StringIO() as stream, contextlib.redirect_stdout(stream), contextlib.redirect_stderr(stream):
+        yield
 
 # Custom CSS for better styling
 st.markdown("""
@@ -258,10 +266,13 @@ def generate_predictions():
 
     param_grid = {'classifier__n_estimators': [100, 200], 'classifier__max_depth': [None, 10, 20], 'classifier__min_samples_split': [2, 5], 'classifier__min_samples_leaf': [1, 2]}
     grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy', verbose=1)
-    grid_search.fit(X_train, y_train)
+    
+    with suppress_stdout():
+        grid_search.fit(X_train, y_train)
 
     best_model = grid_search.best_estimator_
     y_pred = best_model.predict(X_test)
+    st.write('Test Accuracy:', accuracy_score(y_test, y_pred))
 
     games, error = scrape_games()
     if error:
@@ -323,9 +334,9 @@ def generate_predictions():
 def calculate_winnings(df, bet_amount):
     def potential_winnings(odds):
         if odds > 0:
-            return (odds / 100) * bet_amount
+            return (odds / 100) * bet_amount + bet_amount
         else:
-            return (100 / abs(odds)) * bet_amount
+            return (100 / abs(odds)) * bet_amount + bet_amount
     df['Potential Winnings'] = df['Winner Odds'].apply(potential_winnings)
     df['Potential Winnings'] = df['Potential Winnings'].apply(lambda x: f"${x:,.2f}")
     return df
@@ -337,6 +348,7 @@ st.subheader('Generate Predictions for Today\'s Games')
 bet_amount = st.number_input('Enter your bet amount:', min_value=1, value=100, step=1)
 
 if st.button('Generate Predictions'):
+    st.info("Generating Predictions can take a few minutes. It's updating games up to current and retraining the model.")
     with st.spinner('Generating predictions...'):
         final_display_df = generate_predictions()
         final_display_df = calculate_winnings(final_display_df, bet_amount)
@@ -390,6 +402,6 @@ st.sidebar.write("""
 # Add footer with additional links or information
 st.markdown("""
     <div class="footer">
-        <p>&copy; 2024 MLB Predictions. All rights reserved.</p>
+        <p>&copy; 2024 Cobb's ML Predictions. All rights reserved.</p>
     </div>
 """, unsafe_allow_html=True)
