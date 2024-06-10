@@ -162,10 +162,10 @@ def generate_predictions():
     odds2['away_team_abbr'] = odds2['away_team_abbr'].replace(tmap)
     odds2['date'] = pd.to_datetime(odds2['date']).dt.date
 
-    df1 = pd.read_pickle('mlbgamelogs22-23.pkl')
+    df1 = pd.read_pickle('data/mlbgamelogs22-23.pkl')
     df_full = pd.concat([df1, df2])
 
-    odds1 = pd.read_csv('mlbodds22-23.csv')[['date', 'home_team_abbr', 'away_team_abbr', 'home_ml', 'away_ml']]
+    odds1 = pd.read_csv('data/mlbodds22-23.csv')[['date', 'home_team_abbr', 'away_team_abbr', 'home_ml', 'away_ml']]
     odds1['date'] = pd.to_datetime(odds1['date']).dt.date
     odds_full = pd.concat([odds1, odds2])
     odds_full['date'] = pd.to_datetime(odds_full['date'])
