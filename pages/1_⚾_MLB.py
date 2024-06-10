@@ -295,3 +295,16 @@ if st.button('Generate Predictions'):
         # Convert the styled dataframe to HTML
         styled_html = styled_df.to_html()
         st.markdown(styled_html, unsafe_allow_html=True)
+
+st.sidebar.header('About')
+st.sidebar.write("""
+    This page provides predictions for today's MLB games based on historical data and machine learning models. 
+    The predictions include the expected winner, starting pitchers, and the odds for each game.
+""")
+
+# Add footer with additional links or information
+st.markdown("""
+    <div style="position: fixed; left: 0; bottom: 0; width: 100%; background-color: #333333; color: white; text-align: center; padding: 10px;">
+        <p>&copy; 2024 Cobb's ML Predictions. All rights reserved.</p>
+    </div>
+""", unsafe_allow_html=True)
