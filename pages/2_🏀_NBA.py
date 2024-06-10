@@ -1,7 +1,8 @@
 import streamlit as st
-import numpy as np
 import pandas as pd
+import numpy as np
 
+# Function to create a dummy dataframe
 def create_dummy_dataframe():
     data = {
         'Matchup': [
@@ -39,7 +40,7 @@ styled_df = dummy_df.style.set_table_styles(
 ).set_properties(**{'text-align': 'center'})
 
 # Convert the styled dataframe to HTML
-styled_html = styled_df.render()
+styled_html = styled_df.to_html()
 
 # Streamlit app
 st.title('MLB Predictions - Dummy DataFrame')
