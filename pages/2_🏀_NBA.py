@@ -86,12 +86,6 @@ st.sidebar.write("""
     This application provides predictions for today's MLB games based on historical data and machine learning models. 
     The predictions include the expected winner, starting pitchers, and the odds for each game.
 """)
-st.sidebar.subheader('Navigation')
-st.sidebar.write("""
-    - Home
-    - Predictions
-    - About
-""")
 
 # Add footer with additional links or information
 st.markdown("""
