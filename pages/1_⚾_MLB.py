@@ -272,4 +272,26 @@ st.title('MLB Predictions')
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
         final_display_df = generate_predictions()
-        st.dataframe(final_display_df, hide_index=True)
+        styled_df = final_display_df.style.set_table_styles(
+            {
+                'Matchup': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
+                ],
+                'Home Pitcher': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+                ],
+                'Away Pitcher': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+                ],
+                'Predicted Winner': [
+                    {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
+                ],
+                'Winner Odds': [
+                    {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
+                ],
+            }
+        ).set_properties(**{'text-align': 'center'}).hide(axis='index')
+        
+        # Convert the styled dataframe to HTML
+        styled_html = styled_df.to_html()
+        st.markdown(styled_html, unsafe_allow_html=True)
