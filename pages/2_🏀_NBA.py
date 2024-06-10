@@ -335,7 +335,6 @@ st.subheader('Generate Predictions for Today\'s Games')
 
 # Input for bet amount
 bet_amount = st.number_input('Enter your bet amount:', min_value=1, value=100, step=1)
-st.info("Generating Predictions can take a few minutes. It's updating games up to current and retraining the model.")
 
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
