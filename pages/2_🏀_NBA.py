@@ -15,6 +15,7 @@ import logging
 
 # Set Streamlit log level to suppress detailed logging
 logging.getLogger("streamlit").setLevel(logging.ERROR)
+
 # Custom context manager to suppress Streamlit's internal messages
 @contextlib.contextmanager
 def suppress_stdout():
@@ -275,7 +276,6 @@ def generate_predictions():
 
     best_model = grid_search.best_estimator_
     y_pred = best_model.predict(X_test)
-    st.write('Test Accuracy:', accuracy_score(y_test, y_pred))
 
     games, error = scrape_games()
     if error:
@@ -353,7 +353,8 @@ bet_amount = st.number_input('Enter your bet amount:', min_value=1, value=100, s
 if st.button('Generate Predictions'):
     st.info("Generating Predictions can take a few minutes. It's updating games up to current and retraining the model.")
     with st.spinner('Generating predictions...'):
-        final_display_df = generate_predictions()
+        with suppress_stdout():
+            final_display_df = generate_predictions()
         final_display_df = calculate_winnings(final_display_df, bet_amount)
         st.markdown("### Today's Game Predictions")
 
@@ -405,6 +406,6 @@ st.sidebar.write("""
 # Add footer with additional links or information
 st.markdown("""
     <div class="footer">
-        <p>&copy; 2024 Cobb's ML Predictions. All rights reserved.</p>
+        <p>&copy; 2024 MLB Predictions. All rights reserved.</p>
     </div>
 """, unsafe_allow_html=True)
