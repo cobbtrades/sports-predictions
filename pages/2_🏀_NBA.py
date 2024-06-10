@@ -180,6 +180,7 @@ def scrape_games():
         return [], str(e)
     return games, None
 
+@st.cache_data
 def generate_predictions():
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):
