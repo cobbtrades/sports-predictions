@@ -8,6 +8,58 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.impute import SimpleImputer
+import altair as alt
+
+# Custom CSS for better styling
+st.markdown("""
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+        }
+        .main .block-container {
+            padding-top: 2rem;
+        }
+        .css-1d391kg p {
+            font-size: 16px;
+            color: #ffffff;
+        }
+        .css-145kmo2 {
+            background-color: #333333;
+            border: 1px solid #333333;
+            color: #ffffff;
+        }
+        .css-1avcm0n .css-vy48ge {
+            background-color: #2e2e2e;
+            border: 1px solid #444444;
+        }
+        .css-1d391kg h1, .css-1d391kg h2, .css-1d391kg h3, .css-1d391kg h4, .css-1d391kg h5, .css-1d391kg h6 {
+            color: #ffaf42;
+            font-family: 'Arial', sans-serif;
+        }
+        .stButton>button {
+            background-color: #ffaf42;
+            color: #000000;
+            font-weight: bold;
+            border-radius: 10px;
+        }
+        .stButton>button:hover {
+            background-color: #ffcf72;
+            color: #000000;
+        }
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #333333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 sport_dict = {"MLB": "mlb-baseball"}
 teams = ['ARI', 'ATL', 'BAL', 'BOS', 'CHC', 'CHW', 'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KCR', 'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM', 'NYY', 'OAK', 'PHI', 'PIT', 'SDP', 'SEA', 'SFG', 'STL', 'TBR', 'TEX', 'TOR', 'WSN']
@@ -209,7 +261,6 @@ def generate_predictions():
 
     best_model = grid_search.best_estimator_
     y_pred = best_model.predict(X_test)
-    st.write('Test Accuracy:', accuracy_score(y_test, y_pred))
 
     games, error = scrape_games()
     if error:
@@ -229,7 +280,7 @@ def generate_predictions():
         todays_games['Opp'] = todays_games['Opp'].replace(tmap)
         todays_games['Date'] = pd.Timestamp('today').normalize()
 
-    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pSO', 'pERA']
+    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pERA']
     for col in stats_columns:
         todays_games[col] = 0
 
@@ -265,13 +316,28 @@ def generate_predictions():
     display_df['Winner Odds'] = display_df['Winner Odds'].astype(float).astype(int)
     final_display_columns = ['Matchup', 'Home Pitcher', 'Away Pitcher', 'Predicted Winner', 'Winner Odds']
     final_display_df = display_df[final_display_columns]
+
     return final_display_df
 
-st.title('MLB Predictions')
+st.header('Welcome to the MLB Predictions Page')
+st.subheader('Generate Predictions for Today\'s Games')
 
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
         final_display_df = generate_predictions()
+        st.markdown("### Today's Game Predictions")
+        
+        # Interactive Chart Example using Altair
+        chart = alt.Chart(final_display_df).mark_bar().encode(
+            x='Matchup',
+            y='Winner Odds',
+            color='Predicted Winner'
+        ).properties(
+            width=600,
+            height=400
+        )
+        st.altair_chart(chart, use_container_width=True)
+        
         styled_df = final_display_df.style.set_table_styles(
             {
                 'Matchup': [
@@ -296,15 +362,16 @@ if st.button('Generate Predictions'):
         styled_html = styled_df.to_html()
         st.markdown(styled_html, unsafe_allow_html=True)
 
+# Add sidebar with additional information or navigation
 st.sidebar.header('About')
 st.sidebar.write("""
-    This page provides predictions for today's MLB games based on historical data and machine learning models. 
+    This application provides predictions for today's MLB games based on historical data and machine learning models. 
     The predictions include the expected winner, starting pitchers, and the odds for each game.
 """)
 
 # Add footer with additional links or information
 st.markdown("""
-    <div style="position: fixed; left: 0; bottom: 0; width: 100%; background-color: #333333; color: white; text-align: center; padding: 10px;">
-        <p>&copy; 2024 Cobb's ML Predictions. All rights reserved.</p>
+    <div class="footer">
+        <p>&copy; 2024 MLB Predictions. All rights reserved.</p>
     </div>
 """, unsafe_allow_html=True)
