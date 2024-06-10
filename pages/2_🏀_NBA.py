@@ -22,7 +22,7 @@ dummy_df = create_dummy_dataframe()
 styled_df = dummy_df.style.set_table_styles(
     {
         'Matchup': [
-            {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+            {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
         ],
         'Home Pitcher': [
             {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
@@ -31,10 +31,10 @@ styled_df = dummy_df.style.set_table_styles(
             {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
         ],
         'Predicted Winner': [
-            {'selector': 'td', 'props': 'background-color: #000000; color: #006600; font-weight: bold;'},
+            {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
         ],
         'Winner Odds': [
-            {'selector': 'td', 'props': 'background-color: #000000; color: #FFFFFF; font-weight: bold;'},
+            {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
         ],
     }
 ).set_properties(**{'text-align': 'center'})
