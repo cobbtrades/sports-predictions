@@ -9,7 +9,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.impute import SimpleImputer
 
-pd.set_option('display.max_columns', None)
 sport_dict = {"MLB": "mlb-baseball"}
 teams = ['ARI', 'ATL', 'BAL', 'BOS', 'CHC', 'CHW', 'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KCR', 'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM', 'NYY', 'OAK', 'PHI', 'PIT', 'SDP', 'SEA', 'SFG', 'STL', 'TBR', 'TEX', 'TOR', 'WSN']
 tmap = {'KC': 'KCR', 'SD': 'SDP', 'SF': 'SFG', 'TB': 'TBR', 'WAS': 'WSN'}
@@ -273,4 +272,4 @@ st.title('MLB Predictions')
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
         final_display_df = generate_predictions()
-        st.write(final_display_df)
+        st.dataframe(final_display_df, hide_index=True)
