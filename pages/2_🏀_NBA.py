@@ -22,19 +22,19 @@ dummy_df = create_dummy_dataframe()
 styled_df = dummy_df.style.set_table_styles(
     {
         'Matchup': [
-            {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #007acc;'},
+            {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
         ],
         'Home Pitcher': [
-            {'selector': 'td', 'props': 'background-color: #e6f7ff;'},
+            {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
         ],
         'Away Pitcher': [
-            {'selector': 'td', 'props': 'background-color: #e6f7ff;'},
+            {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
         ],
         'Predicted Winner': [
-            {'selector': 'td', 'props': 'background-color: #f4e542; color: #000000; font-weight: bold;'},
+            {'selector': 'td', 'props': 'background-color: #000000; color: #006600; font-weight: bold;'},
         ],
         'Winner Odds': [
-            {'selector': 'td', 'props': 'background-color: #e6ffcc; color: #006600; font-weight: bold;'},
+            {'selector': 'td', 'props': 'background-color: #000000; color: #FFFFFF; font-weight: bold;'},
         ],
     }
 ).set_properties(**{'text-align': 'center'})
