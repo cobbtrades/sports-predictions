@@ -11,7 +11,10 @@ from sklearn.impute import SimpleImputer
 import altair as alt
 import contextlib
 import io
+import logging
 
+# Set Streamlit log level to suppress detailed logging
+logging.getLogger("streamlit").setLevel(logging.ERROR)
 # Custom context manager to suppress Streamlit's internal messages
 @contextlib.contextmanager
 def suppress_stdout():
