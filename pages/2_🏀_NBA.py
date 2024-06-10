@@ -12,13 +12,11 @@ import altair as alt
 import contextlib
 import io
 import logging
-
-# Set Streamlit log level to suppress detailed logging
-logging.getLogger("streamlit").setLevel(logging.ERROR)
+import sys
 
 # Custom context manager to suppress Streamlit's internal messages
 @contextlib.contextmanager
-def suppress_stdout():
+def suppress_stdout_stderr():
     with io.StringIO() as stream, contextlib.redirect_stdout(stream), contextlib.redirect_stderr(stream):
         yield
 
@@ -271,7 +269,7 @@ def generate_predictions():
     param_grid = {'classifier__n_estimators': [100, 200], 'classifier__max_depth': [None, 10, 20], 'classifier__min_samples_split': [2, 5], 'classifier__min_samples_leaf': [1, 2]}
     grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy', verbose=1)
     
-    with suppress_stdout():
+    with suppress_stdout_stderr():
         grid_search.fit(X_train, y_train)
 
     best_model = grid_search.best_estimator_
@@ -353,7 +351,7 @@ bet_amount = st.number_input('Enter your bet amount:', min_value=1, value=100, s
 if st.button('Generate Predictions'):
     st.info("Generating Predictions can take a few minutes. It's updating games up to current and retraining the model.")
     with st.spinner('Generating predictions...'):
-        with suppress_stdout():
+        with suppress_stdout_stderr():
             final_display_df = generate_predictions()
         final_display_df = calculate_winnings(final_display_df, bet_amount)
         st.markdown("### Today's Game Predictions")
