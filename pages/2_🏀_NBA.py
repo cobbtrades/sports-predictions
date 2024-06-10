@@ -321,7 +321,13 @@ def generate_predictions():
     return final_display_df
 
 def calculate_winnings(df, bet_amount):
-    df['Potential Winnings'] = df['Winner Odds'] / 100 * bet_amount
+    def potential_winnings(odds):
+        if odds > 0:
+            return (odds / 100) * bet_amount + bet_amount
+        else:
+            return (100 / abs(odds)) * bet_amount + bet_amount
+    df['Potential Winnings'] = df['Winner Odds'].apply(potential_winnings)
+    df['Potential Winnings'] = df['Potential Winnings'].apply(lambda x: f"${x:,.2f}")
     return df
 
 st.header('Welcome to the MLB Predictions Page')
@@ -331,6 +337,7 @@ st.subheader('Generate Predictions for Today\'s Games')
 bet_amount = st.number_input('Enter your bet amount:', min_value=1, value=100, step=1)
 
 if st.button('Generate Predictions'):
+    st.info("Generating Predictions can take a few minutes. It's updating games up to current and retraining the model.")
     with st.spinner('Generating predictions...'):
         final_display_df = generate_predictions()
         final_display_df = calculate_winnings(final_display_df, bet_amount)
