@@ -261,6 +261,7 @@ def generate_predictions():
 
     best_model = grid_search.best_estimator_
     y_pred = best_model.predict(X_test)
+    st.write('Test Accuracy:', accuracy_score(y_test, y_pred))
 
     games, error = scrape_games()
     if error:
@@ -319,18 +320,26 @@ def generate_predictions():
 
     return final_display_df
 
+def calculate_winnings(df, bet_amount):
+    df['Potential Winnings'] = df['Winner Odds'] / 100 * bet_amount
+    return df
+
 st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
+
+# Input for bet amount
+bet_amount = st.number_input('Enter your bet amount:', min_value=1, value=100, step=1)
 
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
         final_display_df = generate_predictions()
+        final_display_df = calculate_winnings(final_display_df, bet_amount)
         st.markdown("### Today's Game Predictions")
-        
+
         # Interactive Chart Example using Altair
         chart = alt.Chart(final_display_df).mark_bar().encode(
             x='Matchup',
-            y='Winner Odds',
+            y='Potential Winnings',
             color='Predicted Winner'
         ).properties(
             width=600,
@@ -354,6 +363,9 @@ if st.button('Generate Predictions'):
                 ],
                 'Winner Odds': [
                     {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
+                ],
+                'Potential Winnings': [
+                    {'selector': 'td', 'props': 'background-color: #000000; color: #ffffff; font-weight: bold;'},
                 ],
             }
         ).set_properties(**{'text-align': 'center'}).hide(axis='index')
