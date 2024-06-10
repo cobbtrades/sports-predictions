@@ -37,7 +37,7 @@ styled_df = dummy_df.style.set_table_styles(
             {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
         ],
     }
-).set_properties(**{'text-align': 'center'})
+).set_properties(**{'text-align': 'center'}).hide(axis='index')
 
 # Convert the styled dataframe to HTML
 styled_html = styled_df.to_html()
