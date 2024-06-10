@@ -262,7 +262,6 @@ def generate_predictions():
 
     best_model = grid_search.best_estimator_
     y_pred = best_model.predict(X_test)
-    st.write('Test Accuracy:', accuracy_score(y_test, y_pred))
 
     games, error = scrape_games()
     if error:
