@@ -9,6 +9,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.impute import SimpleImputer
 import altair as alt
+from streamlit_extras.badges import badge
 
 # Custom CSS for better styling
 st.markdown("""
@@ -60,6 +61,9 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
+
+def example_buymeacoffee():
+    badge(type="buymeacoffee", name="cobbtradesg")
 
 sport_dict = {"MLB": "mlb-baseball"}
 teams = ['ARI', 'ATL', 'BAL', 'BOS', 'CHC', 'CHW', 'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KCR', 'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM', 'NYY', 'OAK', 'PHI', 'PIT', 'SDP', 'SEA', 'SFG', 'STL', 'TBR', 'TEX', 'TOR', 'WSN']
