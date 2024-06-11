@@ -373,7 +373,7 @@ st.sidebar.write("""
     The predictions include the expected winner, starting pitchers, and the odds for each game.
 """)
 
-with sidebar:
+with st.sidebar:
     buymeacoffee()
 
 # Add footer with additional links or information
