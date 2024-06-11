@@ -62,7 +62,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-def example_buymeacoffee():
+def buymeacoffee():
     badge(type="buymeacoffee", name="cobbtradesg")
 
 sport_dict = {"MLB": "mlb-baseball"}
@@ -372,6 +372,8 @@ st.sidebar.write("""
     This application provides predictions for today's MLB games based on historical data and machine learning models. 
     The predictions include the expected winner, starting pitchers, and the odds for each game.
 """)
+
+buymeacoffee()
 
 # Add footer with additional links or information
 st.markdown("""
