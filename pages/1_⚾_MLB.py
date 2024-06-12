@@ -339,6 +339,8 @@ st.subheader('Generate Predictions for Today\'s Games')
 
 if 'predictions' not in st.session_state:
     st.session_state.predictions = None
+if 'most_confident_game' not in st.session_state:
+    st.session_state.most_confident_game = None
 
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
@@ -387,10 +389,11 @@ if st.session_state.predictions is not None:
         st.markdown(styled_html, unsafe_allow_html=True)
 
     with col2:
-        st.markdown("### Most Confident Prediction")
-        st.markdown(f"**Matchup:** {st.session_state.most_confident_game['Matchup']}")
-        st.markdown(f"**Predicted Winner:** {st.session_state.most_confident_game['Predicted Winner']}")
-        st.markdown(f"**Prediction Confidence:** {st.session_state.most_confident_game['Prediction Confidence']:.2f}")
+        if st.session_state.most_confident_game is not None:
+            st.markdown("### Most Confident Prediction")
+            st.markdown(f"**Matchup:** {st.session_state.most_confident_game['Matchup']}")
+            st.markdown(f"**Predicted Winner:** {st.session_state.most_confident_game['Predicted Winner']}")
+            st.markdown(f"**Prediction Confidence:** {st.session_state.most_confident_game['Prediction Confidence']:.2f}")
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
