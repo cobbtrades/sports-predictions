@@ -284,7 +284,7 @@ def generate_predictions():
         todays_games['Opp'] = todays_games['Opp'].replace(tmap)
         todays_games['Date'] = pd.Timestamp('today').normalize()
 
-    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pERA']
+    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B']
     for col in stats_columns:
         todays_games[col] = 0
 
@@ -377,16 +377,12 @@ if st.session_state.predictions is not None:
             # Find the game with the highest odds
             confident_pick = st.session_state.predictions.loc[st.session_state.predictions['Winner Odds'].idxmax()]
         
-            # Create the chart for the most confident pick
-            confident_chart = alt.Chart(pd.DataFrame([confident_pick])).mark_bar().encode(
-                x=alt.X('Matchup:N', title='Matchup'),
-                y=alt.Y('Winner Odds:Q', title='Odds'),
-                color=alt.Color('Predicted Winner:N', legend=None)
-            ).properties(
-                title='Most Confident Pick'
+            # Display the most confident pick using Streamlit's metric
+            st.metric(
+                label="Most Confident Pick",
+                value=f"{confident_pick['Predicted Winner']} vs {confident_pick['Losing Team']}",
+                delta=f"Odds: {confident_pick['Winner Odds']}"
             )
-        
-            st.altair_chart(confident_chart, use_container_width=True)
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
