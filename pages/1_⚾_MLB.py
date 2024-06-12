@@ -317,7 +317,7 @@ model_path = 'best_model.pkl'
 
 # Function to download the model
 def download_model(url, output):
-    gdown.download(url, output, quiet=False)
+    gdown.download(url, output, quiet=False, fuzzy=True)
 
 if not os.path.exists(model_path):
     download_model(model_url, model_path)
