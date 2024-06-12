@@ -321,16 +321,22 @@ model_url = 'https://drive.google.com/file/d/1poe29O4ucg0XuhsXUxPB-x-QgR0YYM2l/v
 output = 'best_model.pkl'
 gdown.download(url=model_url, output=output, fuzzy=True, quiet=True)
 
-with open(output, 'rb') as f:
-    best_model = pickle.load(f)
-    
+try:
+    with open(output, 'rb') as f:
+        best_model = pickle.load(f)
+except Exception as e:
+    st.error(f"Error loading model: {e}")
+
 if 'predictions' not in st.session_state:
     st.session_state.predictions = None
 
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
-        final_display_df = generate_predictions()
-        st.session_state.predictions = final_display_df
+        try:
+            final_display_df = generate_predictions()
+            st.session_state.predictions = final_display_df
+        except Exception as e:
+            st.error(f"Error generating predictions: {e}")
 
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
