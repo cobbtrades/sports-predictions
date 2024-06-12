@@ -336,45 +336,57 @@ if st.button('Generate Predictions'):
 
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
-    
-    # Display table
-    styled_df = st.session_state.predictions.style.set_table_styles(
-        {
-            'Matchup': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
-            ],
-            'Home Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Away Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Predicted Winner': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
-            ],
-            'Winner Odds': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
-            ],
-        }
-    ).set_properties(**{'text-align': 'center'}).hide(axis='index')
-    
-    # Convert the styled dataframe to HTML
-    styled_html = styled_df.to_html()
-    st.markdown(styled_html, unsafe_allow_html=True)
-    
-    # Find the game with the highest odds
-    confident_pick = st.session_state.predictions.loc[st.session_state.predictions['Winner Odds'].idxmax()]
 
-    # Create the chart for the most confident pick
-    confident_chart = alt.Chart(pd.DataFrame([confident_pick])).mark_bar().encode(
-        x=alt.X('Matchup:N', title='Matchup'),
-        y=alt.Y('Winner Odds:Q', title='Odds'),
-        color=alt.Color('Predicted Winner:N', legend=None)
+    # Interactive Chart Example using Altair
+    chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
+        x='Matchup',
+        y='Winner Odds',
+        color='Predicted Winner'
     ).properties(
-        title='Most Confident Pick'
+        width=600,
+        height=400
     )
-
-    st.altair_chart(confident_chart, use_container_width=True)
+    st.altair_chart(chart, use_container_width=True)
+    lc, rc = st.columns(2)
+    with lc:
+        styled_df = st.session_state.predictions.style.set_table_styles(
+            {
+                'Matchup': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
+                ],
+                'Home Pitcher': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+                ],
+                'Away Pitcher': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+                ],
+                'Predicted Winner': [
+                    {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
+                ],
+                'Winner Odds': [
+                    {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
+                ],
+            }
+        ).set_properties(**{'text-align': 'center'}).hide(axis='index')
+        
+        # Convert the styled dataframe to HTML
+        styled_html = styled_df.to_html()
+        st.markdown(styled_html, unsafe_allow_html=True)
+        
+        with rc:
+            # Find the game with the highest odds
+            confident_pick = st.session_state.predictions.loc[st.session_state.predictions['Winner Odds'].idxmax()]
+        
+            # Create the chart for the most confident pick
+            confident_chart = alt.Chart(pd.DataFrame([confident_pick])).mark_bar().encode(
+                x=alt.X('Matchup:N', title='Matchup'),
+                y=alt.Y('Winner Odds:Q', title='Odds'),
+                color=alt.Color('Predicted Winner:N', legend=None)
+            ).properties(
+                title='Most Confident Pick'
+            )
+        
+            st.altair_chart(confident_chart, use_container_width=True)
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
