@@ -243,7 +243,7 @@ def generate_predictions():
     df = df_merged.copy()
     df = df.sort_values(by=['Date', 'Tm'])
 
-    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pSO', 'pERA']
+    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pERA']
     for col in stats_columns:
         df[f'cumsum_{col}'] = df.groupby('Tm')[col].cumsum() - df[col]
         df[f'cumcount_{col}'] = df.groupby('Tm')[col].cumcount()
@@ -310,24 +310,29 @@ def generate_predictions():
     todays_games = todays_games[['Home', 'Tm', 'Opp', 'TmStart', 'OppStart', 'Tm_ml', 'Opp_ml'] + [f'avg_{col}' for col in stats_columns]]
 
     predicted_outcomes = best_model.predict(todays_games)
+    prediction_probabilities = best_model.predict_proba(todays_games)
+
     predicted_outcomes_series = pd.Series(predicted_outcomes, index=todays_games.index, name='Predicted Outcome')
     todays_games['Predicted Outcome'] = predicted_outcomes_series
+    todays_games['Prediction Confidence'] = prediction_probabilities.max(axis=1)
     todays_games['Predicted Outcome'] = todays_games['Predicted Outcome'].map({0: 'Loss', 1: 'Win'})
     todays_games['Tm'] = todays_games['Tm'].replace(team_name_mapping)
     todays_games['Opp'] = todays_games['Opp'].replace(team_name_mapping)
     todays_games['Predicted Winner'] = todays_games.apply(lambda row: row['Tm'] if row['Predicted Outcome'] == 'Win' else row['Opp'], axis=1)
     todays_games.dropna(inplace=True)
 
-    display_df = todays_games[['Tm', 'Opp', 'Tm_ml', 'Opp_ml', 'Predicted Winner', 'TmStart', 'OppStart']].copy()
+    display_df = todays_games[['Tm', 'Opp', 'Tm_ml', 'Opp_ml', 'Predicted Winner', 'TmStart', 'OppStart', 'Prediction Confidence']].copy()
     display_df.rename(columns={'Tm': 'Home Team', 'Opp': 'Away Team', 'Tm_ml': 'Home Odds', 'Opp_ml': 'Away Odds', 'Predicted Winner': 'Predicted Winner', 'TmStart': 'Home Pitcher', 'OppStart': 'Away Pitcher'}, inplace=True)
     display_df['Losing Team'] = display_df.apply(lambda row: row['Away Team'] if row['Predicted Winner'] == row['Home Team'] else row['Home Team'], axis=1)
     display_df['Matchup'] = display_df.apply(lambda row: f"{row['Predicted Winner']} vs {row['Losing Team']}", axis=1)
     display_df['Winner Odds'] = display_df.apply(lambda row: row['Home Odds'] if row['Predicted Winner'] == row['Home Team'] else row['Away Odds'], axis=1)
     display_df['Winner Odds'] = display_df['Winner Odds'].astype(float).astype(int)
-    final_display_columns = ['Matchup', 'Home Pitcher', 'Away Pitcher', 'Predicted Winner', 'Winner Odds']
+    final_display_columns = ['Matchup', 'Home Pitcher', 'Away Pitcher', 'Predicted Winner', 'Winner Odds', 'Prediction Confidence']
     final_display_df = display_df[final_display_columns]
 
-    return final_display_df
+    most_confident_game = final_display_df.loc[final_display_df['Prediction Confidence'].idxmax()]
+
+    return final_display_df, most_confident_game
 
 st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
@@ -337,46 +342,55 @@ if 'predictions' not in st.session_state:
 
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
-        final_display_df = generate_predictions()
+        final_display_df, most_confident_game = generate_predictions()
         st.session_state.predictions = final_display_df
+        st.session_state.most_confident_game = most_confident_game
 
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
-    
-    # Interactive Chart Example using Altair
-    chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
-        x='Matchup',
-        y='Winner Odds',
-        color='Predicted Winner'
-    ).properties(
-        width=600,
-        height=400
-    )
-    st.altair_chart(chart, use_container_width=True)
-    
-    styled_df = st.session_state.predictions.style.set_table_styles(
-        {
-            'Matchup': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
-            ],
-            'Home Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Away Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Predicted Winner': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
-            ],
-            'Winner Odds': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
-            ],
-        }
-    ).set_properties(**{'text-align': 'center'}).hide(axis='index')
-    
-    # Convert the styled dataframe to HTML
-    styled_html = styled_df.to_html()
-    st.markdown(styled_html, unsafe_allow_html=True)
+
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        # Interactive Chart Example using Altair
+        chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
+            x='Matchup',
+            y='Winner Odds',
+            color='Predicted Winner'
+        ).properties(
+            width=600,
+            height=400
+        )
+        st.altair_chart(chart, use_container_width=True)
+
+        styled_df = st.session_state.predictions.style.set_table_styles(
+            {
+                'Matchup': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
+                ],
+                'Home Pitcher': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+                ],
+                'Away Pitcher': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+                ],
+                'Predicted Winner': [
+                    {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
+                ],
+                'Winner Odds': [
+                    {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
+                ],
+            }
+        ).set_properties(**{'text-align': 'center'}).hide(axis='index')
+
+        # Convert the styled dataframe to HTML
+        styled_html = styled_df.to_html()
+        st.markdown(styled_html, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown("### Most Confident Prediction")
+        st.markdown(f"**Matchup:** {st.session_state.most_confident_game['Matchup']}")
+        st.markdown(f"**Predicted Winner:** {st.session_state.most_confident_game['Predicted Winner']}")
+        st.markdown(f"**Prediction Confidence:** {st.session_state.most_confident_game['Prediction Confidence']:.2f}")
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
