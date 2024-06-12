@@ -188,6 +188,10 @@ def generate_predictions():
     df.fillna(method='bfill', inplace=True)
     df['total'] = df['R'] + df['pR']
 
+    # Debugging: Print the columns of the DataFrame to check for missing columns
+    print("Columns in DataFrame before selecting X:")
+    print(df.columns.tolist())
+
     X = df[['Home', 'Tm', 'Opp', 'TmStart', 'OppStart', 'Tm_ml', 'Opp_ml', 'avg_R', 'avg_H', 'avg_2B', 'avg_3B', 'avg_HR', 'avg_RBI', 'avg_BB', 'avg_SO', 'avg_BA', 'avg_OBP', 'avg_pR', 'avg_pH', 'avg_p2B', 'avg_p3B', 'avg_pHR', 'avg_pBB', 'avg_pSO', 'avg_pERA']]
     y = df['Rslt']
 
