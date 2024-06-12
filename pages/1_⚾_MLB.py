@@ -26,40 +26,40 @@ st.subheader('Generate Predictions for Today\'s Games')
 
 if 'predictions' not in st.session_state:
     st.session_state.predictions = None
+if 'most_confident_prediction' not in st.session_state:
+    st.session_state.most_confident_prediction = None
 
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
-        final_display_df, error = generate_predictions()
+        final_display_df, most_confident_prediction, error = generate_predictions()
         if error:
             st.error(f"Error generating predictions: {error}")
         else:
             st.session_state.predictions = final_display_df
+            st.session_state.most_confident_prediction = most_confident_prediction
 
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
-    chart = alt.Chart(st.session_state.predictions).mark_bar().encode(x='Matchup', y='Winner Odds', color='Predicted Winner').properties(width=600, height=400)
+    chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
+        x='Matchup', y='Winner Odds', color='Predicted Winner'
+    ).properties(width=600, height=400)
     st.altair_chart(chart, use_container_width=True)
+    
     styled_df = st.session_state.predictions.style.set_table_styles(
         {
-            'Matchup': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
-            ],
-            'Home Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Away Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Predicted Winner': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
-            ],
-            'Winner Odds': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
-            ],
+            'Matchup': [{'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'}],
+            'Home Pitcher': [{'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'}],
+            'Away Pitcher': [{'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'}],
+            'Predicted Winner': [{'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'}],
+            'Winner Odds': [{'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'}],
         }
     ).set_properties(**{'text-align': 'center'}).hide(axis='index')
     styled_html = styled_df.to_html()
     st.markdown(styled_html, unsafe_allow_html=True)
+
+    if st.session_state.most_confident_prediction is not None:
+        st.markdown("### Most Confident Prediction")
+        st.write(st.session_state.most_confident_prediction)
 
 st.sidebar.header('About')
 st.sidebar.write("""
