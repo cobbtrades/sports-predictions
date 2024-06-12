@@ -318,7 +318,8 @@ st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
 
 model_url = 'https://drive.google.com/file/d/1poe29O4ucg0XuhsXUxPB-x-QgR0YYM2l/view?usp=sharing'
-gdown.download(url=model_url, output=output, fuzzy=True)
+output = 'best_model.pkl'
+gdown.download(url=model_url, output=output, fuzzy=True, quiet=True)
 
 with open(model_path, 'rb') as f:
     best_model = pickle.load(f)
