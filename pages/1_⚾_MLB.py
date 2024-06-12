@@ -1,5 +1,11 @@
 import streamlit as st
-import requests, pandas as pd, time, numpy as np, pickle, re, json
+import requests
+import pandas as pd
+import time
+import numpy as np
+import pickle
+import re
+import json
 from datetime import datetime, timedelta
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -10,7 +16,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.impute import SimpleImputer
 import altair as alt
 from streamlit_extras.badges import badge
-import pickle
 import gdown
 import os
 
@@ -240,7 +245,7 @@ def generate_predictions():
     df = df_merged.copy()
     df = df.sort_values(by=['Date', 'Tm'])
 
-    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pSO', 'pERA']
+    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pERA']
     for col in stats_columns:
         df[f'cumsum_{col}'] = df.groupby('Tm')[col].cumsum() - df[col]
         df[f'cumcount_{col}'] = df.groupby('Tm')[col].cumcount()
@@ -312,12 +317,15 @@ def generate_predictions():
 st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
 
-model_url = 'https://drive.google.com/file/d/1poe29O4ucg0XuhsXUxPB-x-QgR0YYM2l/view?usp=drive_link'
+model_url = 'https://drive.google.com/uc?id=1poe29O4ucg0XuhsXUxPB-x-QgR0YYM2l'
 model_path = 'best_model.pkl'
 
 # Function to download the model
 def download_model(url, output):
-    gdown.download(url, output, quiet=False, fuzzy=True)
+    try:
+        gdown.download(url, output, quiet=False)
+    except Exception as e:
+        st.error(f"Error downloading model: {e}")
 
 if not os.path.exists(model_path):
     download_model(model_url, model_path)
