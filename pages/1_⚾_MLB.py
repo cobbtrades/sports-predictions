@@ -10,6 +10,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.impute import SimpleImputer
 import altair as alt
 from streamlit_extras.badges import badge
+from io import BytesIO
+from google_drive_downloader import GoogleDriveDownloader as gdd
 
 # Custom CSS for better styling
 st.markdown("""
@@ -184,10 +186,19 @@ def scrape_games():
         return [], str(e)
     return games, None
 
+def download_model(file_id, dest_path):
+    gdd.download_file_from_google_drive(file_id=file_id, dest_path=dest_path, unzip=False)
+
 def generate_predictions():
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
+
+    # Download the pre-trained model
+    download_model('1GOsK05mIuNhh2AofDRSrXE8Tpmg_94q7', 'best_model.pkl')
+
+    with open('best_model.pkl', 'rb') as f:
+        best_model = pickle.load(f)
 
     bat_data = []
     for team in teams:
