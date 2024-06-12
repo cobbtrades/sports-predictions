@@ -317,18 +317,9 @@ def generate_predictions():
 st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
 
-model_url = 'https://drive.google.com/uc?id=1poe29O4ucg0XuhsXUxPB-x-QgR0YYM2l'
-model_path = 'best_model.pkl'
+model_url = 'https://drive.google.com/file/d/1poe29O4ucg0XuhsXUxPB-x-QgR0YYM2l/view?usp=sharing'
+gdown.download(url=model_url, output=output, fuzzy=True)
 
-# Function to download the model
-def download_model(url, output):
-    try:
-        gdown.download(url, output, quiet=False)
-    except Exception as e:
-        st.error(f"Error downloading model: {e}")
-
-if not os.path.exists(model_path):
-    download_model(model_url, model_path)
 with open(model_path, 'rb') as f:
     best_model = pickle.load(f)
     
