@@ -264,6 +264,11 @@ def generate_predictions():
     grid_search.fit(X_train, y_train)
 
     best_model = grid_search.best_estimator_
+
+    # Save the model to a file
+    with open('best_model.pkl', 'wb') as f:
+        pickle.dump(best_model, f)
+
     y_pred = best_model.predict(X_test)
 
     games, error = scrape_games()
