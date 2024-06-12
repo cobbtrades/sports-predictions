@@ -11,6 +11,12 @@ from sklearn.impute import SimpleImputer
 import altair as alt
 from streamlit_extras.badges import badge
 
+st.set_page_config(
+    page_title="Cobb's ML Predictions",
+    page_icon="💰",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 # Custom CSS for better styling
 st.markdown("""
     <style>
