@@ -332,6 +332,8 @@ def generate_predictions():
 
     most_confident_game = final_display_df.loc[final_display_df['Prediction Confidence'].idxmax()]
 
+    st.write("Most Confident Game Data:", most_confident_game)  # Debugging statement
+
     return final_display_df, most_confident_game
 
 st.header('Welcome to the MLB Predictions Page')
@@ -347,6 +349,7 @@ if st.button('Generate Predictions'):
         final_display_df, most_confident_game = generate_predictions()
         st.session_state.predictions = final_display_df
         st.session_state.most_confident_game = most_confident_game
+        st.write("Updated Most Confident Game:", most_confident_game)  # Debugging statement
 
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
@@ -394,6 +397,8 @@ if st.session_state.predictions is not None:
             st.markdown(f"**Matchup:** {st.session_state.most_confident_game['Matchup']}")
             st.markdown(f"**Predicted Winner:** {st.session_state.most_confident_game['Predicted Winner']}")
             st.markdown(f"**Prediction Confidence:** {st.session_state.most_confident_game['Prediction Confidence']:.2f}")
+        else:
+            st.write("No most confident game found.")  # Debugging statement
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
