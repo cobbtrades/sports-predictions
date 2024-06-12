@@ -1,7 +1,7 @@
 import streamlit as st
 import altair as alt
 from streamlit_extras.badges import badge
-from pages.mlb_helpers import fetch_and_process_batting_data, fetch_and_process_pitching_data, fetch_fanduel_mlb_odds, scrape_games, generate_predictions
+from helpers.mlb_helper import fetch_and_process_batting_data, fetch_and_process_pitching_data, fetch_fanduel_mlb_odds, scrape_games, generate_predictions
 
 st.set_page_config(
     page_title="Cobb's ML Predictions",
