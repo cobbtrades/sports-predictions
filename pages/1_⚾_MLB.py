@@ -57,13 +57,13 @@ st.markdown("""
         }
         .footer {
             position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #333333;
-            color: white;
-            text-align: center;
-            padding: 10px;
+            left: 0,
+            bottom: 0,
+            width: 100%,
+            background-color: #333333,
+            color: white,
+            text-align: center,
+            padding: 10px
         }
     </style>
 """, unsafe_allow_html=True)
@@ -312,6 +312,8 @@ def generate_predictions():
     predicted_outcomes = best_model.predict(todays_games)
     prediction_probabilities = best_model.predict_proba(todays_games)
 
+    st.write("Prediction Probabilities:", prediction_probabilities)  # Debugging statement
+
     predicted_outcomes_series = pd.Series(predicted_outcomes, index=todays_games.index, name='Predicted Outcome')
     todays_games['Predicted Outcome'] = predicted_outcomes_series
     todays_games['Prediction Confidence'] = prediction_probabilities.max(axis=1)
@@ -330,9 +332,13 @@ def generate_predictions():
     final_display_columns = ['Matchup', 'Home Pitcher', 'Away Pitcher', 'Predicted Winner', 'Winner Odds', 'Prediction Confidence']
     final_display_df = display_df[final_display_columns]
 
-    most_confident_game = final_display_df.loc[final_display_df['Prediction Confidence'].idxmax()]
+    st.write("Final Display Dataframe:", final_display_df)  # Debugging statement
 
-    st.write("Most Confident Game Data:", most_confident_game)  # Debugging statement
+    if not final_display_df.empty:
+        most_confident_game = final_display_df.loc[final_display_df['Prediction Confidence'].idxmax()]
+        st.write("Most Confident Game Data:", most_confident_game)  # Debugging statement
+    else:
+        most_confident_game = None
 
     return final_display_df, most_confident_game
 
