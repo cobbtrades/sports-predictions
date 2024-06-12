@@ -204,6 +204,7 @@ def generate_predictions():
 
     best_model = grid_search.best_estimator_
     y_pred = best_model.predict(X_test)
+    y_pred_proba = best_model.predict_proba(X_test)  # Get predicted probabilities
 
     games, error = scrape_games()
     if error:
@@ -223,7 +224,7 @@ def generate_predictions():
         todays_games['Opp'] = todays_games['Opp'].replace(tmap)
         todays_games['Date'] = pd.Timestamp('today').normalize()
 
-    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pERA']
+    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pERA']
     for col in stats_columns:
         todays_games[col] = 0
 
@@ -243,21 +244,29 @@ def generate_predictions():
     todays_games = todays_games[['Home', 'Tm', 'Opp', 'TmStart', 'OppStart', 'Tm_ml', 'Opp_ml'] + [f'avg_{col}' for col in stats_columns]]
 
     predicted_outcomes = best_model.predict(todays_games)
+    predicted_probabilities = best_model.predict_proba(todays_games)
+    confidence_scores = predicted_probabilities.max(axis=1)  # Maximum probability of the predicted class
+
     predicted_outcomes_series = pd.Series(predicted_outcomes, index=todays_games.index, name='Predicted Outcome')
+    confidence_scores_series = pd.Series(confidence_scores, index=todays_games.index, name='Confidence Score')
     todays_games['Predicted Outcome'] = predicted_outcomes_series
+    todays_games['Confidence Score'] = confidence_scores_series
     todays_games['Predicted Outcome'] = todays_games['Predicted Outcome'].map({0: 'Loss', 1: 'Win'})
     todays_games['Tm'] = todays_games['Tm'].replace(team_name_mapping)
     todays_games['Opp'] = todays_games['Opp'].replace(team_name_mapping)
     todays_games['Predicted Winner'] = todays_games.apply(lambda row: row['Tm'] if row['Predicted Outcome'] == 'Win' else row['Opp'], axis=1)
     todays_games.dropna(inplace=True)
 
-    display_df = todays_games[['Tm', 'Opp', 'Tm_ml', 'Opp_ml', 'Predicted Winner', 'TmStart', 'OppStart']].copy()
+    display_df = todays_games[['Tm', 'Opp', 'Tm_ml', 'Opp_ml', 'Predicted Winner', 'TmStart', 'OppStart', 'Confidence Score']].copy()
     display_df.rename(columns={'Tm': 'Home Team', 'Opp': 'Away Team', 'Tm_ml': 'Home Odds', 'Opp_ml': 'Away Odds', 'Predicted Winner': 'Predicted Winner', 'TmStart': 'Home Pitcher', 'OppStart': 'Away Pitcher'}, inplace=True)
     display_df['Losing Team'] = display_df.apply(lambda row: row['Away Team'] if row['Predicted Winner'] == row['Home Team'] else row['Home Team'], axis=1)
     display_df['Matchup'] = display_df.apply(lambda row: f"{row['Predicted Winner']} vs {row['Losing Team']}", axis=1)
     display_df['Winner Odds'] = display_df.apply(lambda row: row['Home Odds'] if row['Predicted Winner'] == row['Home Team'] else row['Away Odds'], axis=1)
     display_df['Winner Odds'] = display_df['Winner Odds'].astype(float).astype(int)
-    final_display_columns = ['Matchup', 'Home Pitcher', 'Away Pitcher', 'Predicted Winner', 'Winner Odds']
+    final_display_columns = ['Matchup', 'Home Pitcher', 'Away Pitcher', 'Predicted Winner', 'Winner Odds', 'Confidence Score']
     final_display_df = display_df[final_display_columns]
 
-    return final_display_df, None
+    # Identify the game with the highest confidence score
+    most_confident_prediction = final_display_df.loc[final_display_df['Confidence Score'].idxmax()]
+
+    return final_display_df, most_confident_prediction, None
