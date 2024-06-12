@@ -321,7 +321,7 @@ model_url = 'https://drive.google.com/file/d/1poe29O4ucg0XuhsXUxPB-x-QgR0YYM2l/v
 output = 'best_model.pkl'
 gdown.download(url=model_url, output=output, fuzzy=True, quiet=True)
 
-with open(model_path, 'rb') as f:
+with open(output, 'rb') as f:
     best_model = pickle.load(f)
     
 if 'predictions' not in st.session_state:
