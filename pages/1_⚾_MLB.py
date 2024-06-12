@@ -337,17 +337,7 @@ if st.button('Generate Predictions'):
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
     
-    # Interactive Chart Example using Altair
-    chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
-        x='Matchup',
-        y='Winner Odds',
-        color='Predicted Winner'
-    ).properties(
-        width=600,
-        height=400
-    )
-    st.altair_chart(chart, use_container_width=True)
-    
+    # Display table
     styled_df = st.session_state.predictions.style.set_table_styles(
         {
             'Matchup': [
@@ -371,6 +361,20 @@ if st.session_state.predictions is not None:
     # Convert the styled dataframe to HTML
     styled_html = styled_df.to_html()
     st.markdown(styled_html, unsafe_allow_html=True)
+    
+    # Find the game with the highest odds
+    confident_pick = st.session_state.predictions.loc[st.session_state.predictions['Winner Odds'].idxmax()]
+
+    # Create the chart for the most confident pick
+    confident_chart = alt.Chart(pd.DataFrame([confident_pick])).mark_bar().encode(
+        x=alt.X('Matchup:N', title='Matchup'),
+        y=alt.Y('Winner Odds:Q', title='Odds'),
+        color=alt.Color('Predicted Winner:N', legend=None)
+    ).properties(
+        title='Most Confident Pick'
+    )
+
+    st.altair_chart(confident_chart, use_container_width=True)
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
