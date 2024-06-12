@@ -264,11 +264,6 @@ def generate_predictions():
     grid_search.fit(X_train, y_train)
 
     best_model = grid_search.best_estimator_
-
-    # Save the model to a file
-    with open('best_model.pkl', 'wb') as f:
-        pickle.dump(best_model, f)
-
     y_pred = best_model.predict(X_test)
 
     games, error = scrape_games()
@@ -331,45 +326,51 @@ def generate_predictions():
 st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
 
+if 'predictions' not in st.session_state:
+    st.session_state.predictions = None
+
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
         final_display_df = generate_predictions()
-        st.markdown("### Today's Game Predictions")
-        
-        # Interactive Chart Example using Altair
-        chart = alt.Chart(final_display_df).mark_bar().encode(
-            x='Matchup',
-            y='Winner Odds',
-            color='Predicted Winner'
-        ).properties(
-            width=600,
-            height=400
-        )
-        st.altair_chart(chart, use_container_width=True)
-        
-        styled_df = final_display_df.style.set_table_styles(
-            {
-                'Matchup': [
-                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
-                ],
-                'Home Pitcher': [
-                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-                ],
-                'Away Pitcher': [
-                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-                ],
-                'Predicted Winner': [
-                    {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
-                ],
-                'Winner Odds': [
-                    {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
-                ],
-            }
-        ).set_properties(**{'text-align': 'center'}).hide(axis='index')
-        
-        # Convert the styled dataframe to HTML
-        styled_html = styled_df.to_html()
-        st.markdown(styled_html, unsafe_allow_html=True)
+        st.session_state.predictions = final_display_df
+
+if st.session_state.predictions is not None:
+    st.markdown("### Today's Game Predictions")
+    
+    # Interactive Chart Example using Altair
+    chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
+        x='Matchup',
+        y='Winner Odds',
+        color='Predicted Winner'
+    ).properties(
+        width=600,
+        height=400
+    )
+    st.altair_chart(chart, use_container_width=True)
+    
+    styled_df = st.session_state.predictions.style.set_table_styles(
+        {
+            'Matchup': [
+                {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
+            ],
+            'Home Pitcher': [
+                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+            ],
+            'Away Pitcher': [
+                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+            ],
+            'Predicted Winner': [
+                {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
+            ],
+            'Winner Odds': [
+                {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
+            ],
+        }
+    ).set_properties(**{'text-align': 'center'}).hide(axis='index')
+    
+    # Convert the styled dataframe to HTML
+    styled_html = styled_df.to_html()
+    st.markdown(styled_html, unsafe_allow_html=True)
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
