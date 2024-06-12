@@ -391,6 +391,6 @@ with st.sidebar:
 # Add footer with additional links or information
 st.markdown("""
     <div class="footer">
-        <p>&copy; 2024 MLB Predictions. All rights reserved.</p>
+        <p>&copy; 2024 Cobb's ML MLB Predictions. All rights reserved.</p>
     </div>
 """, unsafe_allow_html=True)
