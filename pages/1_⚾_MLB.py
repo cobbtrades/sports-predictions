@@ -1,11 +1,5 @@
 import streamlit as st
-import requests
-import pandas as pd
-import time
-import numpy as np
-import pickle
-import re
-import json
+import requests, pandas as pd, time, numpy as np, pickle, re, json
 from datetime import datetime, timedelta
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -16,8 +10,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.impute import SimpleImputer
 import altair as alt
 from streamlit_extras.badges import badge
-import gdown
-import os
 
 # Custom CSS for better styling
 st.markdown("""
@@ -245,7 +237,7 @@ def generate_predictions():
     df = df_merged.copy()
     df = df.sort_values(by=['Date', 'Tm'])
 
-    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pERA']
+    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pSO', 'pERA']
     for col in stats_columns:
         df[f'cumsum_{col}'] = df.groupby('Tm')[col].cumsum() - df[col]
         df[f'cumcount_{col}'] = df.groupby('Tm')[col].cumcount()
@@ -256,6 +248,23 @@ def generate_predictions():
     df.drop(columns=[f'cumsum_{col}' for col in stats_columns] + [f'cumcount_{col}' for col in stats_columns], inplace=True)
     df.fillna(method='bfill', inplace=True)
     df['total'] = df['R'] + df['pR']
+
+    X = df[['Home', 'Tm', 'Opp', 'TmStart', 'OppStart', 'Tm_ml', 'Opp_ml', 'avg_R', 'avg_H', 'avg_2B', 'avg_3B', 'avg_HR', 'avg_RBI', 'avg_BB', 'avg_SO', 'avg_BA', 'avg_OBP', 'avg_pR', 'avg_pH', 'avg_p2B', 'avg_p3B', 'avg_pHR', 'avg_pBB', 'avg_pSO', 'avg_pERA']]
+    y = df['Rslt']
+
+    categorical_features = ['Tm', 'TmStart', 'Opp', 'OppStart']
+    categorical_transformer = Pipeline(steps=[('imputer', SimpleImputer(strategy='constant', fill_value='missing')), ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+    preprocessor = ColumnTransformer(transformers=[('cat', categorical_transformer, categorical_features)])
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    model = Pipeline(steps=[('preprocessor', preprocessor), ('classifier', RandomForestClassifier(random_state=42))])
+
+    param_grid = {'classifier__n_estimators': [100, 200], 'classifier__max_depth': [None, 10, 20], 'classifier__min_samples_split': [2, 5], 'classifier__min_samples_leaf': [1, 2]}
+    grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy', verbose=1)
+    grid_search.fit(X_train, y_train)
+
+    best_model = grid_search.best_estimator_
+    y_pred = best_model.predict(X_test)
 
     games, error = scrape_games()
     if error:
@@ -317,64 +326,45 @@ def generate_predictions():
 st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
 
-model_url = 'https://drive.google.com/file/d/1poe29O4ucg0XuhsXUxPB-x-QgR0YYM2l/view?usp=sharing'
-output = 'best_model.pkl'
-gdown.download(url=model_url, output=output, fuzzy=True, quiet=True)
-
-try:
-    with open(output, 'rb') as f:
-        best_model = pickle.load(f)
-except Exception as e:
-    st.error(f"Error loading model: {e}")
-
-if 'predictions' not in st.session_state:
-    st.session_state.predictions = None
-
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
-        try:
-            final_display_df = generate_predictions()
-            st.session_state.predictions = final_display_df
-        except Exception as e:
-            st.error(f"Error generating predictions: {e}")
-
-if st.session_state.predictions is not None:
-    st.markdown("### Today's Game Predictions")
-    
-    # Interactive Chart Example using Altair
-    chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
-        x='Matchup',
-        y='Winner Odds',
-        color='Predicted Winner'
-    ).properties(
-        width=600,
-        height=400
-    )
-    st.altair_chart(chart, use_container_width=True)
-    
-    styled_df = st.session_state.predictions.style.set_table_styles(
-        {
-            'Matchup': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
-            ],
-            'Home Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Away Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Predicted Winner': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
-            ],
-            'Winner Odds': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
-            ],
-        }
-    ).set_properties(**{'text-align': 'center'}).hide(axis='index')
-    
-    # Convert the styled dataframe to HTML
-    styled_html = styled_df.to_html()
-    st.markdown(styled_html, unsafe_allow_html=True)
+        final_display_df = generate_predictions()
+        st.markdown("### Today's Game Predictions")
+        
+        # Interactive Chart Example using Altair
+        chart = alt.Chart(final_display_df).mark_bar().encode(
+            x='Matchup',
+            y='Winner Odds',
+            color='Predicted Winner'
+        ).properties(
+            width=600,
+            height=400
+        )
+        st.altair_chart(chart, use_container_width=True)
+        
+        styled_df = final_display_df.style.set_table_styles(
+            {
+                'Matchup': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
+                ],
+                'Home Pitcher': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+                ],
+                'Away Pitcher': [
+                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+                ],
+                'Predicted Winner': [
+                    {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
+                ],
+                'Winner Odds': [
+                    {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
+                ],
+            }
+        ).set_properties(**{'text-align': 'center'}).hide(axis='index')
+        
+        # Convert the styled dataframe to HTML
+        styled_html = styled_df.to_html()
+        st.markdown(styled_html, unsafe_allow_html=True)
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
