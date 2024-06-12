@@ -284,7 +284,7 @@ def generate_predictions():
         todays_games['Opp'] = todays_games['Opp'].replace(tmap)
         todays_games['Date'] = pd.Timestamp('today').normalize()
 
-    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B']
+    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pERA']
     for col in stats_columns:
         todays_games[col] = 0
 
@@ -336,7 +336,7 @@ if st.button('Generate Predictions'):
 
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
-
+    
     # Interactive Chart Example using Altair
     chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
         x='Matchup',
@@ -347,42 +347,30 @@ if st.session_state.predictions is not None:
         height=400
     )
     st.altair_chart(chart, use_container_width=True)
-    lc, rc = st.columns(2)
-    with lc:
-        styled_df = st.session_state.predictions.style.set_table_styles(
-            {
-                'Matchup': [
-                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
-                ],
-                'Home Pitcher': [
-                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-                ],
-                'Away Pitcher': [
-                    {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-                ],
-                'Predicted Winner': [
-                    {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
-                ],
-                'Winner Odds': [
-                    {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
-                ],
-            }
-        ).set_properties(**{'text-align': 'center'}).hide(axis='index')
-        
-        # Convert the styled dataframe to HTML
-        styled_html = styled_df.to_html()
-        st.markdown(styled_html, unsafe_allow_html=True)
-        
-        with rc:
-            # Find the game with the highest odds
-            confident_pick = st.session_state.predictions.loc[st.session_state.predictions['Winner Odds'].idxmax()]
-        
-            # Display the most confident pick using Streamlit's metric
-            st.metric(
-                label="Most Confident Pick",
-                value=f"{confident_pick['Predicted Winner']} vs {confident_pick['Losing Team']}",
-                delta=f"Odds: {confident_pick['Winner Odds']}"
-            )
+    
+    styled_df = st.session_state.predictions.style.set_table_styles(
+        {
+            'Matchup': [
+                {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
+            ],
+            'Home Pitcher': [
+                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+            ],
+            'Away Pitcher': [
+                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
+            ],
+            'Predicted Winner': [
+                {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
+            ],
+            'Winner Odds': [
+                {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
+            ],
+        }
+    ).set_properties(**{'text-align': 'center'}).hide(axis='index')
+    
+    # Convert the styled dataframe to HTML
+    styled_html = styled_df.to_html()
+    st.markdown(styled_html, unsafe_allow_html=True)
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
