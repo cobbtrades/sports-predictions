@@ -393,7 +393,8 @@ if st.session_state.predictions is not None:
         # Ensure Confidence is numeric with error handling
         confidence_value = highest_confidence_row['Confidence']
         try:
-            confidence_value = float(confidence_value)
+            # Remove the percentage sign and convert to float
+            confidence_value = float(confidence_value.strip('%')) / 100.0
         except ValueError as e:
             st.error(f"Error converting confidence value: {e}")
             st.write(f"Type of confidence_value: {type(confidence_value)}")
