@@ -389,7 +389,9 @@ if st.session_state.predictions is not None:
     with col2:
         st.markdown("### Highest Confidence Prediction")
         highest_confidence_row = st.session_state.predictions.loc[st.session_state.predictions['Confidence'].idxmax()]
-        st.subheader(highest_confidence_row['Predicted Winner'], highest_confidence_row['Confidence']*100, color='#ffaf42')
+        losing_team = highest_confidence_row['Matchup'].replace(f"{highest_confidence_row['Predicted Winner']} vs ", "")
+        
+        st.subheader(highest_confidence_row['Predicted Winner'], highest_confidence_row['Confidence']*100, color='#ffffff')
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
