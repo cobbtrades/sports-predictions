@@ -377,9 +377,26 @@ if st.session_state.predictions is not None:
         }
     ).set_properties(**{'text-align': 'center'}).hide(axis='index')
     
-    # Convert the styled dataframe to HTML
     styled_html = styled_df.to_html()
     st.markdown(styled_html, unsafe_allow_html=True)
+
+    # Create a column layout for the confidence graphic
+    col1, col2 = st.columns([3, 1])
+
+    with col1:
+        st.markdown("### Today's Game Predictions")
+        st.markdown(styled_html, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown("### Highest Confidence Prediction")
+        highest_confidence_row = st.session_state.predictions.loc[st.session_state.predictions['Confidence'].idxmax()]
+
+        fig, ax = plt.subplots()
+        ax.barh(highest_confidence_row['Predicted Winner'], highest_confidence_row['Confidence']*100, color='#ffaf42')
+        ax.set_xlim(0, 100)
+        ax.set_xlabel('Confidence (%)')
+        ax.set_title(f"Highest Confidence: {highest_confidence_row['Predicted Winner']} vs {highest_confidence_row['Losing Team']}")
+        st.pyplot(fig)
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
