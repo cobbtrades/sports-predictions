@@ -1,4 +1,4 @@
-import requests, pandas as pd, time, numpy as np, pickle, re, json, streamlit as st, altair as alt, matplotlib.pyplot as plt
+import requests, pandas as pd, time, numpy as np, pickle, re, json, streamlit as st, altair as alt
 from datetime import datetime, timedelta
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -389,13 +389,7 @@ if st.session_state.predictions is not None:
     with col2:
         st.markdown("### Highest Confidence Prediction")
         highest_confidence_row = st.session_state.predictions.loc[st.session_state.predictions['Confidence'].idxmax()]
-
-        fig, ax = plt.subplots()
-        ax.barh(highest_confidence_row['Predicted Winner'], highest_confidence_row['Confidence']*100, color='#ffaf42')
-        ax.set_xlim(0, 100)
-        ax.set_xlabel('Confidence (%)')
-        #ax.set_title(f"Highest Confidence: {highest_confidence_row['Predicted Winner']} vs {highest_confidence_row['Losing Team']}")
-        st.pyplot(fig)
+        st.subheader(highest_confidence_row['Predicted Winner'], highest_confidence_row['Confidence']*100, color='#ffaf42')
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
