@@ -318,7 +318,7 @@ def generate_predictions():
     todays_games['Predicted Winner'] = todays_games.apply(lambda row: row['Tm'] if row['Predicted Outcome'] == 'Win' else row['Opp'], axis=1)
     todays_games['Confidence'] = predicted_confidence
     todays_games.dropna(inplace=True)
-    display_df = todays_games[['Tm', 'Opp', 'Tm_ml', 'Opp_ml', 'Predicted Winner', 'TmStart', 'OppStart']].copy()
+    display_df = todays_games[['Tm', 'Opp', 'Tm_ml', 'Opp_ml', 'Predicted Winner', 'TmStart', 'OppStart', 'Confidence']].copy()
     display_df.rename(columns={'Tm': 'Home Team','Opp': 'Away Team','Tm_ml': 'Home Odds','Opp_ml': 'Away Odds','Predicted Winner': 'Predicted Winner','TmStart': 'Home Pitcher','OppStart': 'Away Pitcher'}, inplace=True)
     display_df['Losing Team'] = display_df.apply(lambda row: row['Away Team'] if row['Predicted Winner'] == row['Home Team'] else row['Home Team'], axis=1)
     display_df['Matchup'] = display_df.apply(lambda row: f"{row['Predicted Winner']} vs {row['Losing Team']}", axis=1)
@@ -327,7 +327,7 @@ def generate_predictions():
     display_df['Confidence'] = (display_df['Confidence'] * 100).round(2).astype(str) + '%'
     final_display_columns = ['Matchup', 'Home Pitcher', 'Away Pitcher', 'Predicted Winner', 'Winner Odds']
     final_display_df = display_df[final_display_columns]
-    return final_display_df
+    return final_display_df, display_df
 
 st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
@@ -337,7 +337,7 @@ if 'predictions' not in st.session_state:
 
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
-        final_display_df = generate_predictions()
+        final_display_df, display_df = generate_predictions()
         st.session_state.predictions = final_display_df
 
 if st.session_state.predictions is not None:
