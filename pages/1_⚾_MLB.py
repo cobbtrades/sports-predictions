@@ -389,9 +389,17 @@ if st.session_state.predictions is not None:
     with col2:
         st.markdown("### Highest Confidence Prediction")
         highest_confidence_row = st.session_state.predictions.loc[st.session_state.predictions['Confidence'].idxmax()]
+        
+        # Ensure Confidence is numeric
+        confidence_value = highest_confidence_row['Confidence']
+        if not isinstance(confidence_value, (int, float)):
+            confidence_value = float(confidence_value)
+
         losing_team = highest_confidence_row['Matchup'].replace(f"{highest_confidence_row['Predicted Winner']} vs ", "")
+
+        # Display the highest confidence prediction using st.metric
         st.metric(label="Predicted Winner", value=highest_confidence_row['Predicted Winner'])
-        st.metric(label="Confidence", value=f"{highest_confidence_row['Confidence'] * 100:.1f}%")
+        st.metric(label="Confidence", value=f"{confidence_value * 100:.1f}%")
         st.metric(label="Opposing Team", value=losing_team)
 
 # Add sidebar with additional information or navigation
