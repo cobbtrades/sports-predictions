@@ -390,10 +390,14 @@ if st.session_state.predictions is not None:
         st.markdown("### Highest Confidence Prediction")
         highest_confidence_row = st.session_state.predictions.loc[st.session_state.predictions['Confidence'].idxmax()]
         
-        # Ensure Confidence is numeric
+        # Ensure Confidence is numeric with error handling
         confidence_value = highest_confidence_row['Confidence']
-        if not isinstance(confidence_value, (int, float)):
+        try:
             confidence_value = float(confidence_value)
+        except ValueError as e:
+            st.error(f"Error converting confidence value: {e}")
+            st.write(f"Type of confidence_value: {type(confidence_value)}")
+            confidence_value = 0.0  # Default to 0.0 if conversion fails
 
         losing_team = highest_confidence_row['Matchup'].replace(f"{highest_confidence_row['Predicted Winner']} vs ", "")
 
