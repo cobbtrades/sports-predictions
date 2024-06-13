@@ -394,7 +394,7 @@ if st.session_state.predictions is not None:
         ax.barh(highest_confidence_row['Predicted Winner'], highest_confidence_row['Confidence']*100, color='#ffaf42')
         ax.set_xlim(0, 100)
         ax.set_xlabel('Confidence (%)')
-        ax.set_title(f"Highest Confidence: {highest_confidence_row['Predicted Winner']} vs {highest_confidence_row['Losing Team']}")
+        #ax.set_title(f"Highest Confidence: {highest_confidence_row['Predicted Winner']} vs {highest_confidence_row['Losing Team']}")
         st.pyplot(fig)
 
 # Add sidebar with additional information or navigation
