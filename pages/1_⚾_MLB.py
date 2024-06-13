@@ -1,4 +1,4 @@
-import requests, pandas as pd, time, numpy as np, pickle, re, json, streamlit as st, altair as alt
+import requests, pandas as pd, time, numpy as np, pickle, re, json, streamlit as st, altair as alt, matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -378,7 +378,6 @@ if st.session_state.predictions is not None:
     ).set_properties(**{'text-align': 'center'}).hide(axis='index')
     
     styled_html = styled_df.to_html()
-    st.markdown(styled_html, unsafe_allow_html=True)
 
     # Create a column layout for the confidence graphic
     col1, col2 = st.columns([3, 1])
