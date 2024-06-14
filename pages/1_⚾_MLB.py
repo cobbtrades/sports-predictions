@@ -1,68 +1,26 @@
 import requests, pandas as pd, time, numpy as np, pickle, re, json, streamlit as st, altair as alt
 from datetime import datetime, timedelta
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
 from sklearn.impute import SimpleImputer
 from streamlit_extras.badges import badge
+from streamlit_extras.stylable_container import stylable_container
 
-st.set_page_config(
-    page_title="Cobb's ML Predictions",
-    page_icon="💰",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-# Custom CSS for better styling
+st.set_page_config(page_title="Cobb's ML Predictions", page_icon="💰", layout="wide", initial_sidebar_state="expanded")
 st.markdown("""
     <style>
-        body {
-            background-color: #1e1e1e;
-            color: #ffffff;
-            font-family: 'Arial', sans-serif;
-        }
-        .main .block-container {
-            padding-top: 2rem;
-        }
-        .css-1d391kg p {
-            font-size: 16px;
-            color: #ffffff;
-        }
-        .css-145kmo2 {
-            background-color: #333333;
-            border: 1px solid #333333;
-            color: #ffffff;
-        }
-        .css-1avcm0n .css-vy48ge {
-            background-color: #2e2e2e;
-            border: 1px solid #444444;
-        }
-        .css-1d391kg h1, .css-1d391kg h2, .css-1d391kg h3, .css-1d391kg h4, .css-1d391kg h5, .css-1d391kg h6 {
-            color: #ffaf42;
-            font-family: 'Arial', sans-serif;
-        }
-        .stButton>button {
-            background-color: #ffaf42;
-            color: #000000;
-            font-weight: bold;
-            border-radius: 10px;
-        }
-        .stButton>button:hover {
-            background-color: #ffcf72;
-            color: #000000;
-        }
-        .footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #333333;
-            color: white;
-            text-align: center;
-            padding: 10px;
-        }
+        body {background-color: #1e1e1e; color: #ffffff; font-family: 'Arial', sans-serif;}
+        .main .block-container {padding-top: 2rem;}
+        .css-1d391kg p {font-size: 16px; color: #ffffff;}
+        .css-145kmo2 {background-color: #333333; border: 1px solid #333333; color: #ffffff;}
+        .css-1avcm0n .css-vy48ge {background-color: #2e2e2e; border: 1px solid #444444;}
+        .css-1d391kg h1, .css-1d391kg h2, .css-1d391kg h3, .css-1d391kg h4, .css-1d391kg h5, .css-1d391kg h6 {color: #ffaf42; font-family: 'Arial', sans-serif;}
+        .stButton>button {background-color: #ffaf42; color: #000000; font-weight: bold; border-radius: 10px;}
+        .stButton>button:hover {background-color: #ffcf72; color: #000000;}
+        .footer {position: fixed; left: 0; bottom: 0; width: 100%; background-color: #333333; color: white; text-align: center; padding: 10px;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -79,6 +37,7 @@ team_name_mapping = {
     'OAK': 'Oakland Athletics', 'PHI': 'Philadelphia Phillies', 'PIT': 'Pittsburgh Pirates', 'SDP': 'San Diego Padres', 'SEA': 'Seattle Mariners', 'SFG': 'San Francisco Giants',
     'STL': 'St. Louis Cardinals', 'TBR': 'Tampa Bay Rays', 'TEX': 'Texas Rangers', 'TOR': 'Toronto Blue Jays', 'WSN': 'Washington Nationals'
 }
+team_acronyms = {v: k for k, v in team_name_mapping.items()}
 
 @st.cache_data
 def fetch_and_process_batting_data(team, year):
@@ -268,7 +227,6 @@ def generate_predictions():
     grid_search.fit(X_train, y_train)
 
     best_model = grid_search.best_estimator_
-    y_pred = best_model.predict(X_test)
 
     games, error = scrape_games()
     if error:
@@ -387,9 +345,9 @@ if st.session_state.predictions is not None:
         st.markdown(styled_html, unsafe_allow_html=True)
 
     with col2:
-        st.markdown("### Highest Confidence Prediction")
+        st.markdown("### Highest Confidence Prediction", unsafe_allow_html=True)
         highest_confidence_row = st.session_state.predictions.loc[st.session_state.predictions['Confidence'].idxmax()]
-        
+
         # Ensure Confidence is numeric with error handling
         confidence_value = highest_confidence_row['Confidence']
         try:
@@ -400,12 +358,16 @@ if st.session_state.predictions is not None:
             st.write(f"Type of confidence_value: {type(confidence_value)}")
             confidence_value = 0.0  # Default to 0.0 if conversion fails
 
-        losing_team = highest_confidence_row['Matchup'].replace(f"{highest_confidence_row['Predicted Winner']} vs ", "")
+        losing_team_full = highest_confidence_row['Matchup'].replace(f"{highest_confidence_row['Predicted Winner']} vs ", "")
+
+        # Map full team names to their acronyms
+        predicted_winner_acronym = team_acronyms.get(highest_confidence_row['Predicted Winner'], 'unknown')
+        losing_team_acronym = team_acronyms.get(losing_team_full, 'unknown')
 
         # Display the highest confidence prediction using st.metric
-        st.metric(label="Predicted Winner", value=highest_confidence_row['Predicted Winner'])
+        st.image(f'logos/{predicted_winner_acronym}.svg', width=100, caption=highest_confidence_row['Predicted Winner'], use_column_width='auto')
         st.metric(label="Confidence", value=f"{confidence_value * 100:.1f}%")
-        st.metric(label="Opposing Team", value=losing_team)
+        st.image(f'logos/{losing_team_acronym}.svg', width=100, caption=losing_team_full, use_column_width='auto')
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
