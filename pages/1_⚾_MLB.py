@@ -328,7 +328,7 @@ if st.session_state.predictions is not None:
         st.markdown("### Highest Confidence Prediction", unsafe_allow_html=True)
 
         # Ensure the Confidence column is numeric
-        st.session_state.predictions['Confidence'] = st.session_state.predictions['Confidence'].astype(float)
+        st.session_state.predictions['Confidence'] = st.session_state.predictions['Confidence'].str.strip("%").astype(float)
 
         highest_confidence_row = st.session_state.predictions.loc[st.session_state.predictions['Confidence'].idxmax()]
 
