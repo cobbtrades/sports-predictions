@@ -1,4 +1,4 @@
-import requests, pandas as pd, time, numpy as np, pickle, re, json, streamlit as st, altair as alt
+import requests, pandas as pd, time, numpy as np, pickle, re, json, streamlit as st, altair as alt, base64
 from datetime import datetime, timedelta
 from streamlit_extras.badges import badge
 
@@ -265,18 +265,23 @@ def generate_predictions():
     display_df['Winner Odds'] = display_df['Winner Odds'].astype(float).astype(int)
     final_display_columns = ['Matchup', 'Home Pitcher', 'Away Pitcher', 'Predicted Winner', 'Winner Odds']
     final_display_df = display_df[final_display_columns]
-    return final_display_df
+    return final_display_df, todays_games
 
 st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
+
+def get_highest_confidence_game(todays_games):
+    max_confidence_idx = todays_games['Confidence'].idxmax()
+    return todays_games.loc[max_confidence_idx]
 
 if 'predictions' not in st.session_state:
     st.session_state.predictions = None
 
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
-        final_display_df = generate_predictions()
+        final_display_df, todays_games = generate_predictions()
         st.session_state.predictions = final_display_df
+        st.session_state.todaygames = todays_games
 
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
@@ -314,8 +319,49 @@ if st.session_state.predictions is not None:
     
     styled_html = styled_df.to_html()
 
-    st.markdown("### Today's Game Predictions")
-    st.markdown(styled_html, unsafe_allow_html=True)
+    lc, rc = st.columns([3,1])
+    with lc:
+        st.markdown("### Today's Game Predictions")
+        st.markdown(styled_html, unsafe_allow_html=True)
+    with rc:
+        st.markdown("### Highest Confidence Prediction")
+        highest_confidence_game = get_highest_confidence_game(st.session_state.todaygames)
+        
+        home_team = highest_confidence_game['Tm']
+        away_team = highest_confidence_game['Opp']
+        confidence = highest_confidence_game['Confidence']
+        predicted_winner = highest_confidence_game['Predicted Winner']
+        losing_team = away_team if predicted_winner == home_team else home_team
+        winner_odds = highest_confidence_game['Tm_ml'] if predicted_winner == home_team else highest_confidence_game['Opp_ml']
+        
+        winner_logo_path = f'logos/{team_acronyms[predicted_winner]}.svg'
+        loser_logo_path = f'logos/{team_acronyms[losing_team]}.svg'
+
+        try:
+            def svg_to_base64(svg_file_path):
+                with open(svg_file_path, "rb") as svg_file:
+                    svg_bytes = svg_file.read()
+                    return base64.b64encode(svg_bytes).decode()
+
+            winner_logo_base64 = svg_to_base64(winner_logo_path)
+            loser_logo_base64 = svg_to_base64(loser_logo_path)
+
+            st.markdown(f"""
+            <div style="text-align: center;">
+                <img src="data:image/svg+xml;base64,{winner_logo_base64}" alt="{home_team} Logo" style="height: 100px;">
+            </div>
+            <div style="text-align: center;">
+                <h4>{predicted_winner} is predicted to win with {confidence:.2f}% confidence</h4>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <img src="data:image/svg+xml;base64,{loser_logo_base64}" alt="{away_team} Logo" style="height: 100px;">
+            </div>
+            """, unsafe_allow_html=True)
+
+        except FileNotFoundError as e:
+            st.error(f"Error loading team logos: {e}")
+        except Exception as e:
+            st.error(f"An unexpected error occurred: {e}")
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
