@@ -1,13 +1,6 @@
 import requests, pandas as pd, time, numpy as np, pickle, re, json, streamlit as st, altair as alt
 from datetime import datetime, timedelta
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.impute import SimpleImputer
 from streamlit_extras.badges import badge
-from streamlit_extras.stylable_container import stylable_container
 
 st.set_page_config(page_title="Cobb's ML Predictions", page_icon="💰", layout="wide", initial_sidebar_state="expanded")
 st.markdown("""
@@ -200,7 +193,7 @@ def generate_predictions():
     df = df_merged.copy()
     df = df.sort_values(by=['Date', 'Tm'])
 
-    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pSO', 'pERA']
+    stats_columns = ['R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'SO', 'BA', 'OBP', 'pR', 'pH', 'p2B', 'p3B', 'pHR', 'pBB', 'pERA']
     for col in stats_columns:
         df[f'cumsum_{col}'] = df.groupby('Tm')[col].cumsum() - df[col]
         df[f'cumcount_{col}'] = df.groupby('Tm')[col].cumcount()
@@ -212,21 +205,8 @@ def generate_predictions():
     df.fillna(method='bfill', inplace=True)
     df['total'] = df['R'] + df['pR']
 
-    X = df[['Home', 'Tm', 'Opp', 'TmStart', 'OppStart', 'Tm_ml', 'Opp_ml', 'avg_R', 'avg_H', 'avg_2B', 'avg_3B', 'avg_HR', 'avg_RBI', 'avg_BB', 'avg_SO', 'avg_BA', 'avg_OBP', 'avg_pR', 'avg_pH', 'avg_p2B', 'avg_p3B', 'avg_pHR', 'avg_pBB', 'avg_pSO', 'avg_pERA']]
-    y = df['Rslt']
-
-    categorical_features = ['Tm', 'TmStart', 'Opp', 'OppStart']
-    categorical_transformer = Pipeline(steps=[('imputer', SimpleImputer(strategy='constant', fill_value='missing')), ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    preprocessor = ColumnTransformer(transformers=[('cat', categorical_transformer, categorical_features)])
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    model = Pipeline(steps=[('preprocessor', preprocessor), ('classifier', RandomForestClassifier(random_state=42))])
-
-    param_grid = {'classifier__n_estimators': [100, 200], 'classifier__max_depth': [None, 10, 20], 'classifier__min_samples_split': [2, 5], 'classifier__min_samples_leaf': [1, 2]}
-    grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy', verbose=1)
-    grid_search.fit(X_train, y_train)
-
-    best_model = grid_search.best_estimator_
+    with open('best_model.pkl', 'rb') as f:
+        best_model = pickle.load(f)
 
     games, error = scrape_games()
     if error:
@@ -275,6 +255,7 @@ def generate_predictions():
     todays_games['Opp'] = todays_games['Opp'].replace(team_name_mapping)
     todays_games['Predicted Winner'] = todays_games.apply(lambda row: row['Tm'] if row['Predicted Outcome'] == 'Win' else row['Opp'], axis=1)
     todays_games['Confidence'] = predicted_confidence
+    todays_games['Confidence'] = (todays_games['Confidence'] * 100).round(2)
     todays_games.dropna(inplace=True)
     display_df = todays_games[['Tm', 'Opp', 'Tm_ml', 'Opp_ml', 'Predicted Winner', 'Confidence', 'TmStart', 'OppStart']].copy()
     display_df.rename(columns={'Tm': 'Home Team','Opp': 'Away Team','Tm_ml': 'Home Odds','Opp_ml': 'Away Odds','Predicted Winner': 'Predicted Winner','Confidence': 'Confidence','TmStart': 'Home Pitcher','OppStart': 'Away Pitcher'}, inplace=True)
@@ -282,7 +263,6 @@ def generate_predictions():
     display_df['Matchup'] = display_df.apply(lambda row: f"{row['Predicted Winner']} vs {row['Losing Team']}", axis=1)
     display_df['Winner Odds'] = display_df.apply(lambda row: row['Home Odds'] if row['Predicted Winner'] == row['Home Team'] else row['Away Odds'], axis=1)
     display_df['Winner Odds'] = display_df['Winner Odds'].astype(float).astype(int)
-    display_df['Confidence'] = (display_df['Confidence'] * 100).round(2).astype(str) + '%'
     final_display_columns = ['Matchup', 'Home Pitcher', 'Away Pitcher', 'Predicted Winner', 'Winner Odds', 'Confidence']
     final_display_df = display_df[final_display_columns]
     return final_display_df
@@ -346,28 +326,33 @@ if st.session_state.predictions is not None:
 
     with col2:
         st.markdown("### Highest Confidence Prediction", unsafe_allow_html=True)
+
+        # Ensure the Confidence column is numeric
+        st.session_state.predictions['Confidence'] = st.session_state.predictions['Confidence'].astype(float)
+
         highest_confidence_row = st.session_state.predictions.loc[st.session_state.predictions['Confidence'].idxmax()]
 
-        # Ensure Confidence is numeric with error handling
-        confidence_value = highest_confidence_row['Confidence']
-        try:
-            # Remove the percentage sign and convert to float
-            confidence_value = float(confidence_value.strip('%')) / 100.0
-        except ValueError as e:
-            st.error(f"Error converting confidence value: {e}")
-            st.write(f"Type of confidence_value: {type(confidence_value)}")
-            confidence_value = 0.0  # Default to 0.0 if conversion fails
+        confidence_value = highest_confidence_row['Confidence'] / 100.0
 
         losing_team_full = highest_confidence_row['Matchup'].replace(f"{highest_confidence_row['Predicted Winner']} vs ", "")
 
         # Map full team names to their acronyms
         predicted_winner_acronym = team_acronyms.get(highest_confidence_row['Predicted Winner'], 'unknown')
         losing_team_acronym = team_acronyms.get(losing_team_full, 'unknown')
-
-        # Display the highest confidence prediction using st.metric
-        st.image(f'logos/{predicted_winner_acronym}.svg', width=100, caption=highest_confidence_row['Predicted Winner'], use_column_width='auto')
-        st.metric(label="Confidence", value=f"{confidence_value * 100:.1f}%")
-        st.image(f'logos/{losing_team_acronym}.svg', width=100, caption=losing_team_full, use_column_width='auto')
+        st.markdown(
+        """
+        <style>
+        div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
+            text-align: center;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+        )
+        # Use Streamlit's built-in methods to display images and metrics
+        st.image(f'logos/{predicted_winner_acronym}.svg', caption=highest_confidence_row['Predicted Winner'], width=200)
+        st.subheader(f"{confidence_value * 100:.1f}%")
+        st.image(f'logos/{losing_team_acronym}.svg', caption=losing_team_full, width=200)
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
