@@ -314,33 +314,8 @@ if st.session_state.predictions is not None:
     
     styled_html = styled_df.to_html()
 
-    # Create a column layout for the confidence graphic
-    col1, col2 = st.columns([3, 1])
-
-    with col1:
-        st.markdown("### Today's Game Predictions")
-        st.markdown(styled_html, unsafe_allow_html=True)
-
-    with col2:
-        st.markdown("### Highest Confidence Prediction", unsafe_allow_html=True)
-
-        # Ensure the Confidence column is numeric
-        st.session_state.predictions['Confidence'] = st.session_state.predictions['Confidence']
-
-        highest_confidence_row = st.session_state.predictions.loc[st.session_state.predictions['Confidence'].idxmax()]
-
-        confidence_value = highest_confidence_row['Confidence'] / 100.0
-
-        losing_team_full = highest_confidence_row['Matchup'].replace(f"{highest_confidence_row['Predicted Winner']} vs ", "")
-
-        # Map full team names to their acronyms
-        predicted_winner_acronym = team_acronyms.get(highest_confidence_row['Predicted Winner'], 'unknown')
-        losing_team_acronym = team_acronyms.get(losing_team_full, 'unknown')
-
-        # Use Streamlit's built-in methods to display images and metrics
-        st.image(f'logos/{predicted_winner_acronym}.svg', caption=highest_confidence_row['Predicted Winner'], width=200)
-        st.subheader(f"{confidence_value * 100:.1f}%")
-        st.image(f'logos/{losing_team_acronym}.svg', caption=losing_team_full, width=200)
+    st.markdown("### Today's Game Predictions")
+    st.markdown(styled_html, unsafe_allow_html=True)
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
