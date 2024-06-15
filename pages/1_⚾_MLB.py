@@ -339,16 +339,7 @@ if st.session_state.predictions is not None:
         # Map full team names to their acronyms
         predicted_winner_acronym = team_acronyms.get(highest_confidence_row['Predicted Winner'], 'unknown')
         losing_team_acronym = team_acronyms.get(losing_team_full, 'unknown')
-        st.markdown(
-        """
-        <style>
-        div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
-            text-align: center;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-        )
+
         # Use Streamlit's built-in methods to display images and metrics
         st.image(f'logos/{predicted_winner_acronym}.svg', caption=highest_confidence_row['Predicted Winner'], width=200)
         st.subheader(f"{confidence_value * 100:.1f}%")
