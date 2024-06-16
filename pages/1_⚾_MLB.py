@@ -265,7 +265,7 @@ def generate_predictions():
     display_df['Winner Odds'] = display_df['Winner Odds'].astype(float).astype(int)
     final_display_columns = ['Matchup', 'Home Pitcher', 'Away Pitcher', 'Predicted Winner', 'Winner Odds']
     final_display_df = display_df[final_display_columns]
-    return final_display_df, todays_games
+    return final_display_df, todays_games, df
 
 st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
@@ -274,14 +274,21 @@ def get_highest_confidence_game(todays_games):
     max_confidence_idx = todays_games['Confidence'].idxmax()
     return todays_games.loc[max_confidence_idx]
 
+def get_historical_record(df, team1, team2):
+    matchups = df[((df['Tm'] == team1) & (df['Opp'] == team2)) | ((df['Tm'] == team2) & (df['Opp'] == team1))]
+    team1_wins = len(matchups[(matchups['Tm'] == team1) & (matchups['R'] > matchups['pR'])]) + len(matchups[(matchups['Opp'] == team1) & (matchups['R'] < matchups['pR'])])
+    team2_wins = len(matchups[(matchups['Tm'] == team2) & (matchups['R'] > matchups['pR'])]) + len(matchups[(matchups['Opp'] == team2) & (matchups['R'] < matchups['pR'])])
+    return team1_wins, team2_wins
+
 if 'predictions' not in st.session_state:
     st.session_state.predictions = None
 
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
-        final_display_df, todays_games = generate_predictions()
+        final_display_df, todays_games, df = generate_predictions()
         st.session_state.predictions = final_display_df
         st.session_state.todaygames = todays_games
+        st.session_state.df = df
 
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
@@ -362,6 +369,14 @@ if st.session_state.predictions is not None:
             st.error(f"Error loading team logos: {e}")
         except Exception as e:
             st.error(f"An unexpected error occurred: {e}")
+
+        team1_wins, team2_wins = get_historical_record(st.session_state.df, team_acronyms[predicted_winner], team_acronyms[losing_team])
+        st.markdown(f"""
+        <div style="text-align: center;">
+            <h4>Historical Record</h4>
+            <h5>{team_acronyms[predicted_winner]} vs {team_acronyms[losing_team]}: {team1_wins} - {team2_wins}</h5>
+        </div>
+        """, unsafe_allow_html=True)
 
 # Add sidebar with additional information or navigation
 st.sidebar.header('About')
