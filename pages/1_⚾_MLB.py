@@ -34,84 +34,96 @@ team_acronyms = {v: k for k, v in team_name_mapping.items()}
 
 @st.cache_data
 def fetch_and_process_batting_data(team, year):
-    batting_url = f'https://www.baseball-reference.com/teams/tgl.cgi?team={team}&t=b&year={year}'
-    bat_df = pd.read_html(batting_url)[0]
-    bat_df.insert(loc=0, column='Year', value=year)
-    numeric_cols = ['PA', 'AB', 'R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'IBB', 'SO', 'HBP', 'SH', 'SF', 'ROE', 'GDP', 'SB', 'CS', 'LOB', 'BA', 'OBP', 'SLG', 'OPS']
-    for col in numeric_cols:
-        bat_df[col] = pd.to_numeric(bat_df[col], errors='coerce')
-    bat_df['Rslt'] = bat_df['Rslt'].str.startswith('W').astype(int)
-    bat_df = bat_df[bat_df['Opp'] != 'Opp']
-    bat_df = bat_df[~bat_df['Date'].str.contains('susp', na=False)]
-    bat_df['Date'] = bat_df['Date'].str.replace(r'\s+\(\d\)', '', regex=True)
-    bat_df['Date'] = bat_df['Date'] + ', ' + bat_df['Year'].astype(str)
-    bat_df['Date'] = pd.to_datetime(bat_df['Date'], format='%b %d, %Y')
-    bat_df.rename(columns={'Unnamed: 3': 'Home', 'Opp. Starter (GmeSc)': 'OppStart'}, inplace=True)
-    bat_df.insert(bat_df.columns.get_loc('Opp'), 'Tm', team)
-    bat_df.drop(['Rk', 'Year', '#'], axis=1, inplace=True)
-    bat_df['Home'] = bat_df['Home'].isna()
-    bat_df['OppStart'] = bat_df['OppStart'].str.replace(r'\(.*\)', '', regex=True)
-    return bat_df
+    try:
+        batting_url = f'https://www.baseball-reference.com/teams/tgl.cgi?team={team}&t=b&year={year}'
+        bat_df = pd.read_html(batting_url)[0]
+        bat_df.insert(loc=0, column='Year', value=year)
+        numeric_cols = ['PA', 'AB', 'R', 'H', '2B', '3B', 'HR', 'RBI', 'BB', 'IBB', 'SO', 'HBP', 'SH', 'SF', 'ROE', 'GDP', 'SB', 'CS', 'LOB', 'BA', 'OBP', 'SLG', 'OPS']
+        for col in numeric_cols:
+            bat_df[col] = pd.to_numeric(bat_df[col], errors='coerce')
+        bat_df['Rslt'] = bat_df['Rslt'].str.startswith('W').astype(int)
+        bat_df = bat_df[bat_df['Opp'] != 'Opp']
+        bat_df = bat_df[~bat_df['Date'].str.contains('susp', na=False)]
+        bat_df['Date'] = bat_df['Date'].str.replace(r'\s+\(\d\)', '', regex=True)
+        bat_df['Date'] = bat_df['Date'] + ', ' + bat_df['Year'].astype(str)
+        bat_df['Date'] = pd.to_datetime(bat_df['Date'], format='%b %d, %Y')
+        bat_df.rename(columns={'Unnamed: 3': 'Home', 'Opp. Starter (GmeSc)': 'OppStart'}, inplace=True)
+        bat_df.insert(bat_df.columns.get_loc('Opp'), 'Tm', team)
+        bat_df.drop(['Rk', 'Year', '#'], axis=1, inplace=True)
+        bat_df['Home'] = bat_df['Home'].isna()
+        bat_df['OppStart'] = bat_df['OppStart'].str.replace(r'\(.*\)', '', regex=True)
+        return bat_df
+    except Exception as e:
+        st.error(f"Error fetching batting data for team {team}: {e}")
+        return pd.DataFrame()
 
 @st.cache_data
 def fetch_and_process_pitching_data(team, year):
-    pitching_url = f'https://www.baseball-reference.com/teams/tgl.cgi?team={team}&t=p&year={year}'
-    pit_df = pd.read_html(pitching_url)[1]
-    pit_df.insert(loc=0, column='Year', value=year)
-    pit_df.insert(pit_df.columns.get_loc('Opp'), 'Tm', team)
-    numeric_cols = ['H', 'R', 'ER', 'UER', 'BB', 'SO', 'HR', 'HBP', 'ERA', 'Pit', 'Str', 'IR', 'IS', 'SB', 'CS', 'AB', '2B', '3B', 'IBB', 'SH', 'SF', 'ROE', 'GDP']
-    for col in numeric_cols:
-        pit_df[col] = pd.to_numeric(pit_df[col], errors='coerce')
-    pit_df = pit_df[pit_df['Opp'] != 'Opp']
-    pit_df = pit_df[~pit_df['Date'].str.contains('susp', na=False)]
-    pit_df['Date'] = pit_df['Date'].str.replace(r'\(\d\)', '', regex=True)
-    pit_df['Date'] = pit_df['Date'] + ', ' + pit_df['Year'].astype(str)
-    pit_df['Date'] = pd.to_datetime(pit_df['Date'], format='%b %d, %Y')
-    pit_df.rename(columns={pit_df.columns[-1]: 'TmStart'}, inplace=True)
-    pit_df['TmStart'] = pit_df['TmStart'].str.split().str[0]
-    pit_df.drop(['Year', 'Rk', 'Unnamed: 3', 'Rslt', 'IP', 'BF', '#', 'Umpire'], axis=1, inplace=True)
-    pit_pre = [col for col in pit_df.columns if col not in ['Gtm', 'Date', 'Tm', 'Opp', 'TmStart']]
-    pit_df.rename(columns={col: f'p{col}' for col in pit_pre}, inplace=True)
-    return pit_df
+    try:
+        pitching_url = f'https://www.baseball-reference.com/teams/tgl.cgi?team={team}&t=p&year={year}'
+        pit_df = pd.read_html(pitching_url)[1]
+        pit_df.insert(loc=0, column='Year', value=year)
+        pit_df.insert(pit_df.columns.get_loc('Opp'), 'Tm', team)
+        numeric_cols = ['H', 'R', 'ER', 'UER', 'BB', 'SO', 'HR', 'HBP', 'ERA', 'Pit', 'Str', 'IR', 'IS', 'SB', 'CS', 'AB', '2B', '3B', 'IBB', 'SH', 'SF', 'ROE', 'GDP']
+        for col in numeric_cols:
+            pit_df[col] = pd.to_numeric(pit_df[col], errors='coerce')
+        pit_df = pit_df[pit_df['Opp'] != 'Opp']
+        pit_df = pit_df[~pit_df['Date'].str.contains('susp', na=False)]
+        pit_df['Date'] = pit_df['Date'].str.replace(r'\(\d\)', '', regex=True)
+        pit_df['Date'] = pit_df['Date'] + ', ' + pit_df['Year'].astype(str)
+        pit_df['Date'] = pd.to_datetime(pit_df['Date'], format='%b %d, %Y')
+        pit_df.rename(columns={pit_df.columns[-1]: 'TmStart'}, inplace=True)
+        pit_df['TmStart'] = pit_df['TmStart'].str.split().str[0]
+        pit_df.drop(['Year', 'Rk', 'Unnamed: 3', 'Rslt', 'IP', 'BF', '#', 'Umpire'], axis=1, inplace=True)
+        pit_pre = [col for col in pit_df.columns if col not in ['Gtm', 'Date', 'Tm', 'Opp', 'TmStart']]
+        pit_df.rename(columns={col: f'p{col}' for col in pit_pre}, inplace=True)
+        return pit_df
+    except Exception as e:
+        st.error(f"Error fetching pitching data for team {team}: {e}")
+        return pd.DataFrame()
 
 @st.cache_data
 def fetch_fanduel_mlb_odds(date):
-    sport = "MLB"
-    date_str = date.strftime("%Y-%m-%d")
-    spread_url = f"https://www.sportsbookreview.com/betting-odds/{sport_dict[sport]}/?date={date_str}"
-    r = requests.get(spread_url)
-    j = re.findall('__NEXT_DATA__" type="application/json">(.*?)</script>', r.text)
-    if not j:
+    try:
+        sport = "MLB"
+        date_str = date.strftime("%Y-%m-%d")
+        spread_url = f"https://www.sportsbookreview.com/betting-odds/{sport_dict[sport]}/?date={date_str}"
+        r = requests.get(spread_url)
+        j = re.findall('__NEXT_DATA__" type="application/json">(.*?)</script>', r.text)
+        if not j:
+            return []
+        build_id = json.loads(j[0])['buildId']
+        odds_url = f"https://www.sportsbookreview.com/_next/data/{build_id}/betting-odds/{sport_dict[sport]}/money-line/full-game.json?league={sport_dict[sport]}&oddsType=money-line&oddsScope=full-game&date={date_str}"
+        odds_json = requests.get(odds_url).json()
+        if 'oddsTables' in odds_json['pageProps'] and odds_json['pageProps']['oddsTables']:
+            games_list = odds_json['pageProps']['oddsTables'][0]['oddsTableModel']['gameRows']
+        else:
+            return []
+        fanduel_games = []
+        for game in games_list:
+            if game['oddsViews']:
+                for odds_view in game['oddsViews']:
+                    if odds_view and odds_view.get('sportsbook', '').lower() == 'fanduel':
+                        game_data = {
+                            'date': game['gameView']['startDate'],
+                            'home_team_abbr': game['gameView']['homeTeam']['shortName'],
+                            'away_team_abbr': game['gameView']['awayTeam']['shortName'],
+                            'home_ml': odds_view['currentLine'].get('homeOdds', 'N/A'),
+                            'away_ml': odds_view['currentLine'].get('awayOdds', 'N/A')
+                        }
+                        fanduel_games.append(game_data)
+                        break
+        return fanduel_games
+    except Exception as e:
+        st.error(f"Error fetching Fanduel odds: {e}")
         return []
-    build_id = json.loads(j[0])['buildId']
-    odds_url = f"https://www.sportsbookreview.com/_next/data/{build_id}/betting-odds/{sport_dict[sport]}/money-line/full-game.json?league={sport_dict[sport]}&oddsType=money-line&oddsScope=full-game&date={date_str}"
-    odds_json = requests.get(odds_url).json()
-    if 'oddsTables' in odds_json['pageProps'] and odds_json['pageProps']['oddsTables']:
-        games_list = odds_json['pageProps']['oddsTables'][0]['oddsTableModel']['gameRows']
-    else:
-        return []
-    fanduel_games = []
-    for game in games_list:
-        if game['oddsViews']:
-            for odds_view in game['oddsViews']:
-                if odds_view and odds_view.get('sportsbook', '').lower() == 'fanduel':
-                    game_data = {
-                        'date': game['gameView']['startDate'],
-                        'home_team_abbr': game['gameView']['homeTeam']['shortName'],
-                        'away_team_abbr': game['gameView']['awayTeam']['shortName'],
-                        'home_ml': odds_view['currentLine'].get('homeOdds', 'N/A'),
-                        'away_ml': odds_view['currentLine'].get('awayOdds', 'N/A')
-                    }
-                    fanduel_games.append(game_data)
-                    break
-    return fanduel_games
 
 @st.cache_data
 def scrape_games():
-    date = datetime.today().strftime("%Y-%m-%d")
-    spread_url = f"https://www.sportsbookreview.com/betting-odds/mlb-baseball/?date={date}"
-    r = requests.get(spread_url)
     try:
+        date = datetime.today().strftime("%Y-%m-%d")
+        spread_url = f"https://www.sportsbookreview.com/betting-odds/mlb-baseball/?date={date}"
+        r = requests.get(spread_url)
         build_id = json.loads(re.findall('__NEXT_DATA__" type="application/json">(.*?)</script>', r.text)[0])['buildId']
         moneyline_url = f"https://www.sportsbookreview.com/_next/data/{build_id}/betting-odds/mlb-baseball/money-line/full-game.json?league=mlb-baseball&oddsType=money-line&oddsScope=full-game&date={date}"
         moneyline_json = requests.get(moneyline_url).json()
@@ -136,9 +148,9 @@ def scrape_games():
                     game['away_ml'] = line['currentLine']['awayOdds']
                     break
             games.append(game)
+        return games, None
     except Exception as e:
         return [], str(e)
-    return games, None
 
 def generate_predictions():
     def daterange(start_date, end_date):
