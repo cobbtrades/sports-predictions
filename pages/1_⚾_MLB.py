@@ -353,8 +353,8 @@ if st.session_state.predictions is not None:
         losing_team = away_team if predicted_winner == home_team else home_team
         winner_odds = highest_confidence_game['Tm_ml'] if predicted_winner == home_team else highest_confidence_game['Opp_ml']
         
-        winner_logo_path = f'logos/{team_acronyms[predicted_winner]}.svg'
-        loser_logo_path = f'logos/{team_acronyms[losing_team]}.svg'
+        winner_logo_path = f'logos/{team_acronyms[predicted_winner].lower()}.svg'
+        loser_logo_path = f'logos/{team_acronyms[losing_team].lower()}.svg'
 
         try:
             def svg_to_base64(svg_file_path):
