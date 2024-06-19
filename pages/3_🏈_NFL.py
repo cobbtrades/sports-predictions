@@ -45,3 +45,20 @@ st.markdown("""
         </div>
     </div>
 """, unsafe_allow_html=True)
+
+# Add sidebar with additional information or navigation
+st.sidebar.header('About')
+st.sidebar.write("""
+    This application provides predictions for today's NFL games based on historical data and machine learning models. 
+    The predictions include the expected winner and the odds for each game.
+""")
+
+with st.sidebar:
+    buymeacoffee()
+
+# Add footer with additional links or information
+st.markdown("""
+    <div class="footer">
+        <p>&copy; 2024 Cobb's NFL ML Predictions. All rights reserved.</p>
+    </div>
+""", unsafe_allow_html=True)
