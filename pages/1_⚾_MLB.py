@@ -343,7 +343,7 @@ if st.session_state.predictions is not None:
         st.markdown("### Today's Game Predictions")
         st.markdown(styled_html, unsafe_allow_html=True)
     with rc:
-        st.markdown(f"""<div style="text-align: center;"><h2>Highest Confidence Prediction</h2></div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div style="text-align: center;"><h3>Highest Confidence Prediction</h3></div>""", unsafe_allow_html=True)
         highest_confidence_game = get_highest_confidence_game(st.session_state.todaygames)
         
         home_team = highest_confidence_game['Tm']
