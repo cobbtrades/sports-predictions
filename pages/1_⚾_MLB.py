@@ -367,13 +367,13 @@ if st.session_state.predictions is not None:
 
             st.markdown(f"""
             <div style="text-align: center;">
-                <img src="data:image/svg+xml;base64,{winner_logo_base64}" alt="{home_team} Logo" style="height: 100px;">
+                <img src="data:image/svg+xml;base64,{winner_logo_base64}" alt="{predicted_winner} Logo" style="height: 100px;">
             </div>
             <div style="text-align: center;">
                 <h4>{predicted_winner} is predicted to win with {confidence:.2f}% confidence</h4>
             </div>
             <div style="text-align: center; margin-top: 20px;">
-                <img src="data:image/svg+xml;base64,{loser_logo_base64}" alt="{away_team} Logo" style="height: 100px;">
+                <img src="data:image/svg+xml;base64,{loser_logo_base64}" alt="{losing_team} Logo" style="height: 100px;">
             </div>
             """, unsafe_allow_html=True)
 
@@ -403,6 +403,6 @@ with st.sidebar:
 # Add footer with additional links or information
 st.markdown("""
     <div class="footer">
-        <p>&copy; 2024 MLB Predictions. All rights reserved.</p>
+        <p>&copy; 2024 Cobb's MLB ML Predictions. All rights reserved.</p>
     </div>
 """, unsafe_allow_html=True)
