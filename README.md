@@ -53,4 +53,4 @@ For any questions or suggestions, please contact cobbtrades@gmail.com.
 
 Support the project: If you find this project useful, you can support it by [Buying Me A Coffee](https://www.buymeacoffee.com/cobbtradesg)
 
-© 2024 Cobb's MLB ML Predictions. All rights reserved.
+© 2024 Cobb's ML Predictions. All rights reserved.
