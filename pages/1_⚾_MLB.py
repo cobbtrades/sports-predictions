@@ -353,8 +353,8 @@ if st.session_state.predictions is not None:
         losing_team = away_team if predicted_winner == home_team else home_team
         winner_odds = highest_confidence_game['Tm_ml'] if predicted_winner == home_team else highest_confidence_game['Opp_ml']
         
-        winner_logo_path = f'logos/{team_acronyms[predicted_winner].lower()}.svg'
-        loser_logo_path = f'logos/{team_acronyms[losing_team].lower()}.svg'
+        winner_logo_path = f'logos/{team_acronyms[predicted_winner]}.svg'
+        loser_logo_path = f'logos/{team_acronyms[losing_team]}.svg'
 
         try:
             def svg_to_base64(svg_file_path):
@@ -362,8 +362,8 @@ if st.session_state.predictions is not None:
                     svg_bytes = svg_file.read()
                     return base64.b64encode(svg_bytes).decode()
 
-            winner_logo_base64 = svg_to_base64(winner_logo_path)
-            loser_logo_base64 = svg_to_base64(loser_logo_path)
+            winner_logo_base64 = svg_to_base64(winner_logo_path.lower())
+            loser_logo_base64 = svg_to_base64(loser_logo_path.lower())
 
             st.markdown(f"""
             <div style="text-align: center;">
