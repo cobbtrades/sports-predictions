@@ -49,4 +49,4 @@ This project is licensed under the MIT License. See the LICENSE file for details
 <h2>Acknowledgements</h2>
 Special thanks to the open-source community for providing the tools and libraries that made this project possible.
 <h2>Contact</h2>
-For any questions or suggestions, please contact yourname@example.com.
+For any questions or suggestions, please contact cobbtrades@gmail.com.
