@@ -36,7 +36,7 @@ To generate predictions for today's MLB games:
    3. View the predictions, highest confidence game, and historical records.
 <h2>Interactive Charts</h2>
    - The predictions are displayed with interactive Altair charts, allowing you to visualize the data in a more engaging way.
-<h2>Styling</h2>h2>
+<h2>Styling</h2>
 The app uses custom styling to provide a dark theme with the following styles:
    - Background color: #1e1e1e
    - Text color: #ffffff
