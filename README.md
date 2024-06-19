@@ -51,7 +51,6 @@ Special thanks to the open-source community for providing the tools and librarie
 ## Contact
 For any questions or suggestions, please contact cobbtrades@gmail.com.
 
-Support the project: If you find this project useful, you can support it by buying me a coffee.
-[Buy Me A Coffee](https://www.buymeacoffee.com/cobbtradesg)
+Support the project: If you find this project useful, you can support it by [Buying Me A Coffee](https://www.buymeacoffee.com/cobbtradesg)
 
 © 2024 Cobb's MLB ML Predictions. All rights reserved.
