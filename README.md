@@ -27,6 +27,7 @@ To run this application locally, follow these steps:
 
 3. **Run the application:**
    streamlit run Home.py
+Alternatively, you can run the application online by visiting [Cobb's ML Predictions](https://sports-predictor.streamlit.app).
 
 ## Usage
 Generate Predictions
