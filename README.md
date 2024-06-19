@@ -27,3 +27,31 @@ To run this application locally, follow these steps:
 
 3. **Run the application:**
    streamlit run Home.py
+
+<h2>Usage</h2>
+Generate Predictions
+To generate predictions for today's MLB games:
+
+Open the application.
+Click the Generate Predictions button.
+View the predictions, highest confidence game, and historical records.
+Interactive Charts
+The predictions are displayed with interactive Altair charts, allowing you to visualize the data in a more engaging way.
+Styling
+The app uses custom styling to provide a dark theme with the following styles:
+
+Background color: #1e1e1e
+Text color: #ffffff
+Button color: #ffaf42
+Chart colors: Aligned with the dark theme
+Contributing
+Contributions are welcome! If you have any ideas or improvements, feel free to open an issue or submit a pull request.
+
+License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+Acknowledgements
+Special thanks to the open-source community for providing the tools and libraries that made this project possible.
+
+Contact
+For any questions or suggestions, please contact yourname@example.com.
