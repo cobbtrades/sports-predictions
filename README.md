@@ -1,6 +1,6 @@
 # Cobb's MLB ML Predictions
 
-Welcome to Cobb's MLB ML Predictions, a web application that provides predictions for Major League Baseball (MLB) games based on historical data and machine learning models. The app offers insights into the expected winners, starting pitchers, and betting odds for each game.
+Welcome to Cobb's ML Predictions, a web application that provides predictions for Major League Baseball (MLB) games based on historical data and machine learning models. The app offers insights into the expected winners, starting pitchers, and betting odds for each game.
 
 ## Features
 
