@@ -7,6 +7,9 @@ st.title("NFL Predictions")
 st.markdown("""
 Here are the latest predictions for NFL games.
 """)
+
+def buymeacoffee():
+    badge(type="buymeacoffee", name="cobbtradesg")
 st.markdown("""
     <style>
     .coming-soon-container {
