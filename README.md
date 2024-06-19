@@ -50,3 +50,9 @@ This project is licensed under the MIT License. See the LICENSE file for details
 Special thanks to the open-source community for providing the tools and libraries that made this project possible.
 ## Contact
 For any questions or suggestions, please contact cobbtrades@gmail.com.
+
+Support the project: If you find this project useful, you can support it by buying me a coffee.
+
+![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=cobbtradesg&button_colour=ffdd00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)
+
+© 2024 Cobb's MLB ML Predictions. All rights reserved.
