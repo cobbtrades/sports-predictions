@@ -38,7 +38,6 @@ st.markdown("""
             <div class="emoji">🚧</div>
             <div class="coming-soon-text">Coming Soon</div>
             <div class="emoji">🚧</div>
-            <div class="coming-soon-subtext">Stay tuned for upcoming earnings!</div>
         </div>
     </div>
 """, unsafe_allow_html=True)
