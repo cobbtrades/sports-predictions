@@ -26,4 +26,4 @@ To run this application locally, follow these steps:
    pip install -r requirements.txt
 
 3. **Run the application:**
-   streamlit run 
+   streamlit run Home.py
