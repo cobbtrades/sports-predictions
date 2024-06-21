@@ -313,7 +313,7 @@ if st.session_state.predictions is not None:
         height=400
     )
     st.altair_chart(chart, use_container_width=True)
-
+    display_df = st.session_state.predictions
     display_df['Home Team Acronym'] = display_df['Home Team'].map(team_acronyms)
     display_df['Away Team Acronym'] = display_df['Away Team'].map(team_acronyms)
     
