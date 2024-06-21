@@ -295,10 +295,10 @@ if 'predictions' not in st.session_state:
 
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
-        final_display_df, todays_games, df = generate_predictions()
-        st.session_state.predictions = final_display_df
+        display_df, todays_games, df = generate_predictions()
+        st.session_state.predictions = display_df
         st.session_state.todaygames = todays_games
-        st.session_state.df = df
+        st.session_state.df = df        
 
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
@@ -313,28 +313,24 @@ if st.session_state.predictions is not None:
         height=400
     )
     st.altair_chart(chart, use_container_width=True)
+
+    display_df['Home Team Acronym'] = display_df['Home Team'].map(team_acronyms)
+    display_df['Away Team Acronym'] = display_df['Away Team'].map(team_acronyms)
     
-    styled_df = st.session_state.predictions.style.set_table_styles(
-        {
-            'Matchup': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
-            ],
-            'Home Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Away Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Predicted Winner': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
-            ],
-            'Winner Odds': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
-            ],
-        }
-    ).set_properties(**{'text-align': 'center'}).hide(axis='index')
+    # Generate the file paths for logos
+    display_df['Home Team Logo'] = display_df['Home Team Acronym'].apply(lambda x: f'logos/{x}.svg')
+    display_df['Away Team Logo'] = display_df['Away Team Acronym'].apply(lambda x: f'logos/{x}.svg')
     
-    styled_html = styled_df.to_html()
+    for i, row in display_df.iterrows():
+        st.write(
+            f"""
+            ![Home Team]({row['Home Team Logo']}) vs ![Away Team]({row['Away Team Logo']})  
+            **Predicted Winner:** {row['Predicted Winner']}  
+            **Home Pitcher:** {row['Home Pitcher']}  
+            **Away Pitcher:** {row['Away Pitcher']}  
+            **Winner Odds:** {row['Winner odds']}
+            """
+        )
 
     lc, rc = st.columns([3,1])
     with lc:
