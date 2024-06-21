@@ -296,6 +296,10 @@ if 'predictions' not in st.session_state:
 if st.button('Generate Predictions'):
     with st.spinner('Generating predictions...'):
         display_df, todays_games, df = generate_predictions()
+        display_df['Home Team Acronym'] = display_df['Home Team'].map(team_acronyms)
+        display_df['Away Team Acronym'] = display_df['Away Team'].map(team_acronyms)
+        display_df['Home Team Logo'] = display_df['Home Team Acronym'].apply(lambda x: f'logos/{x}.svg')
+        display_df['Away Team Logo'] = display_df['Away Team Acronym'].apply(lambda x: f'logos/{x}.svg')
         st.session_state.predictions = display_df
         st.session_state.todaygames = todays_games
         st.session_state.df = df        
@@ -313,15 +317,8 @@ if st.session_state.predictions is not None:
         height=400
     )
     st.altair_chart(chart, use_container_width=True)
-    display_df = st.session_state.predictions
-    display_df['Home Team Acronym'] = display_df['Home Team'].map(team_acronyms)
-    display_df['Away Team Acronym'] = display_df['Away Team'].map(team_acronyms)
     
-    # Generate the file paths for logos
-    display_df['Home Team Logo'] = display_df['Home Team Acronym'].apply(lambda x: f'logos/{x}.svg')
-    display_df['Away Team Logo'] = display_df['Away Team Acronym'].apply(lambda x: f'logos/{x}.svg')
-    
-    for i, row in display_df.iterrows():
+    for i, row in st.session_state.predictions.iterrows():
         st.write(
             f"""
             ![Home Team]({row['Home Team Logo']}) vs ![Away Team]({row['Away Team Logo']})  
