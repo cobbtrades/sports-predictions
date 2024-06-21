@@ -302,6 +302,26 @@ if st.button('Generate Predictions'):
         st.session_state.todaygames = todays_games
         st.session_state.df = df
 
+def svg_to_base64(svg_file_path):
+    try:
+        with open(svg_file_path, "rb") as svg_file:
+            svg_bytes = svg_file.read()
+            return base64.b64encode(svg_bytes).decode()
+    except FileNotFoundError:
+        return None
+
+def replace_team_with_logo(row):
+    winner_logo_path = f'logos/{team_acronyms[row["Predicted Winner"]]}.svg'
+    loser_logo_path = f'logos/{team_acronyms[row["Losing Team"]]}.svg'
+
+    winner_logo_base64 = svg_to_base64(winner_logo_path.lower())
+    loser_logo_base64 = svg_to_base64(loser_logo_path.lower())
+
+    if winner_logo_base64 and loser_logo_base64:
+        return f'<img src="data:image/svg+xml;base64,{winner_logo_base64}" alt="{row["Predicted Winner"]} Logo" style="height: 20px;"> vs <img src="data:image/svg+xml;base64,{loser_logo_base64}" alt="{row["Losing Team"]} Logo" style="height: 20px;">'
+    else:
+        return f'{row["Predicted Winner"]} vs {row["Losing Team"]}'
+
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
     
@@ -315,6 +335,8 @@ if st.session_state.predictions is not None:
         height=400
     )
     st.altair_chart(chart, use_container_width=True)
+
+    st.session_state.predictions['Matchup'] = st.session_state.predictions.apply(replace_team_with_logo, axis=1)
     
     styled_df = st.session_state.predictions.style.set_table_styles(
         {
@@ -336,7 +358,7 @@ if st.session_state.predictions is not None:
         }
     ).set_properties(**{'text-align': 'center'}).hide(axis='index')
     
-    styled_html = styled_df.to_html()
+    styled_html = styled_df.to_html(escape=False)
 
     lc, rc = st.columns([3,1])
     with lc:
@@ -357,11 +379,6 @@ if st.session_state.predictions is not None:
         loser_logo_path = f'logos/{team_acronyms[losing_team]}.svg'
 
         try:
-            def svg_to_base64(svg_file_path):
-                with open(svg_file_path, "rb") as svg_file:
-                    svg_bytes = svg_file.read()
-                    return base64.b64encode(svg_bytes).decode()
-
             winner_logo_base64 = svg_to_base64(winner_logo_path.lower())
             loser_logo_base64 = svg_to_base64(loser_logo_path.lower())
 
