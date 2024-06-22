@@ -337,27 +337,33 @@ if st.session_state.predictions is not None:
                 away_logo_base64 = svg_to_base64(away_logo_path.lower())
 
                 return f"""
-                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                        <figure style="margin-right: 10px;">
-                            <img src="data:image/svg+xml;base64,{home_logo_base64}" alt="{row['Home Team']} Logo" style="height: 100px;">
-                            <figcaption style="text-align: center; color: white;">{row['Home Team']}</figcaption>
-                        </figure>
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            <b>Predicted Winner:</b> {row['Predicted Winner']} <br>
-                            <b>Confidence:</b> {row['Confidence']}% <br>
-                            <b>Home Pitcher:</b> {row['Home Pitcher']} <br>
-                            <b>Away Pitcher:</b> {row['Away Pitcher']} <br>
-                            <b>Winner Odds:</b> {row['Winner Odds']}
+                    <div class="prediction-container">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <figure style="margin-right: 10px;">
+                                <img src="data:image/svg+xml;base64,{home_logo_base64}" alt="{row['Home Team']} Logo" style="height: 100px;">
+                                <figcaption style="text-align: center; color: white;">{row['Home Team']}</figcaption>
+                            </figure>
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <b>Predicted Winner:</b> {row['Predicted Winner']} <br>
+                                <b>Confidence:</b> {row['Confidence']}% <br>
+                                <b>Home Pitcher:</b> {row['Home Pitcher']} <br>
+                                <b>Away Pitcher:</b> {row['Away Pitcher']} <br>
+                                <b>Winner Odds:</b> {row['Winner Odds']}
+                            </div>
+                            <figure style="margin-left: 10px;">
+                                <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 100px;">
+                                <figcaption style="text-align: center; color: white;">{row['Away Team']}</figcaption>
+                            </figure>
                         </div>
-                        <figure style="margin-left: 10px;">
-                            <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 100px;">
-                            <figcaption style="text-align: center; color: white;">{row['Away Team']}</figcaption>
-                        </figure>
                     </div>
                 """
             except FileNotFoundError as e:
                 st.error(f"Error loading team logos: {e}")
-                return f"{row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}"
+                return f"""
+                    <div class="prediction-container">
+                        {row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}
+                    </div>
+                """
 
         col1, col2, col3 = st.columns(3)
         for index, row in df.iterrows():
