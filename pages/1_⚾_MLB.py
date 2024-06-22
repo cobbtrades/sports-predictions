@@ -275,9 +275,7 @@ def generate_predictions():
     display_df['Matchup'] = display_df.apply(lambda row: f"{row['Predicted Winner']} vs {row['Losing Team']}", axis=1)
     display_df['Winner Odds'] = display_df.apply(lambda row: row['Home Odds'] if row['Predicted Winner'] == row['Home Team'] else row['Away Odds'], axis=1)
     display_df['Winner Odds'] = display_df['Winner Odds'].astype(float).astype(int)
-    final_display_columns = ['Matchup', 'Home Pitcher', 'Away Pitcher', 'Predicted Winner', 'Winner Odds']
-    final_display_df = display_df[final_display_columns]
-    return final_display_df, todays_games, df
+    return display_df, todays_games, df
 
 st.header('Welcome to the MLB Predictions Page')
 st.subheader('Generate Predictions for Today\'s Games')
@@ -316,27 +314,11 @@ if st.session_state.predictions is not None:
     )
     st.altair_chart(chart, use_container_width=True)
     
-    styled_df = st.session_state.predictions.style.set_table_styles(
-        {
-            'Matchup': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffaf42; background-color: #000000;'},
-            ],
-            'Home Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Away Pitcher': [
-                {'selector': 'td', 'props': 'font-weight: bold; color: #ffffff; background-color: #000000;'},
-            ],
-            'Predicted Winner': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #49f770; font-weight: bold;'},
-            ],
-            'Winner Odds': [
-                {'selector': 'td', 'props': 'background-color: #000000; color: #2daefd; font-weight: bold;'},
-            ],
-        }
-    ).set_properties(**{'text-align': 'center'}).hide(axis='index')
-    
-    styled_html = styled_df.to_html()
+    df = st.session_state.predictions
+    def construct_markdown(row):
+        return f"{row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}"
+    for index, row in df.iterrows():
+    st.markdown(construct_markdown(row))    
 
     lc, rc = st.columns([3,1])
     with lc:
