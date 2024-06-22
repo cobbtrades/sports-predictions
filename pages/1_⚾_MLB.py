@@ -324,7 +324,7 @@ if st.session_state.predictions is not None:
     )
     st.altair_chart(chart, use_container_width=True)
 
-    lc, rc = st.columns([3,1])
+    blc, lc, brc, rc = st.columns([1,3,1,1])
     with lc:
         st.markdown("### Today's Game Predictions")
         df = st.session_state.predictions
