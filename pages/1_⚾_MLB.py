@@ -2,7 +2,7 @@ import requests, pandas as pd, time, numpy as np, pickle, re, json, streamlit as
 from datetime import datetime, timedelta
 from streamlit_extras.badges import badge
 
-st.set_page_config(page_title="Cobb's ML Predictions", page_icon="💰", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Cobb's MLB Predictions", page_icon="💰", layout="wide", initial_sidebar_state="expanded")
 st.markdown("""
     <style>
         body {background-color: #1e1e1e; color: #ffffff; font-family: 'Arial', sans-serif;}
@@ -312,7 +312,7 @@ if st.button('Generate Predictions'):
 
 if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
-    
+
     # Interactive Chart Example using Altair
     chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
         x='Matchup',
@@ -337,9 +337,17 @@ if st.session_state.predictions is not None:
                 away_logo_base64 = svg_to_base64(away_logo_path.lower())
 
                 return f"""
-                    <div style="display: flex; align-items: center;">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
                         <img src="data:image/svg+xml;base64,{home_logo_base64}" alt="{row['Home Team']} Logo" style="height: 50px; margin-right: 10px;">
-                        <span>@ <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 50px; margin-left: 10px;"> | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}</span>
+                        <span style="flex-grow: 1; text-align: center;">vs</span>
+                        <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 50px; margin-left: 10px;">
+                    </div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <b>Predicted Winner:</b> {row['Predicted Winner']} <br>
+                        <b>Confidence:</b> {row['Confidence']}% <br>
+                        <b>Home Pitcher:</b> {row['Home Pitcher']} <br>
+                        <b>Away Pitcher:</b> {row['Away Pitcher']} <br>
+                        <b>Winner Odds:</b> {row['Winner Odds']}
                     </div>
                 """
             except FileNotFoundError as e:
