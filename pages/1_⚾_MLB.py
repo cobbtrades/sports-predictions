@@ -324,7 +324,7 @@ if st.session_state.predictions is not None:
     )
     st.altair_chart(chart, use_container_width=True)
 
-    blc, lc, brc, rc = st.columns([1,3,1,1])
+    lc, rc = st.columns([3,1])
     with lc:
         st.markdown("### Today's Game Predictions")
         df = st.session_state.predictions
@@ -338,9 +338,9 @@ if st.session_state.predictions is not None:
 
                 return f"""
                     <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                        <img src="data:image/svg+xml;base64,{home_logo_base64}" alt="{row['Home Team']} Logo" style="height: 50px; margin-right: 10px;">
+                        <img src="data:image/svg+xml;base64,{home_logo_base64}" alt="{row['Home Team']} Logo" style="height: 100px; margin-right: 10px;">
                         <span style="flex-grow: 1; text-align: center;">vs</span>
-                        <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 50px; margin-left: 10px;">
+                        <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 100px; margin-left: 10px;">
                     </div>
                     <div style="text-align: center; margin-bottom: 20px;">
                         <b>Predicted Winner:</b> {row['Predicted Winner']} <br>
