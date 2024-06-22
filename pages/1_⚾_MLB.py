@@ -351,7 +351,7 @@ if st.session_state.predictions is not None:
                                 <b>Away Pitcher:</b> {row['Away Pitcher']} <br>
                                 <b>Winner Odds:</b> {row['Winner Odds']}
                             </div>
-                            <figure style="margin-left: 10px;">
+                            <figure style="margin-right: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                                 <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 100px;">
                                 <figcaption style="text-align: center; color: white;">{row['Away Team']}</figcaption>
                             </figure>
