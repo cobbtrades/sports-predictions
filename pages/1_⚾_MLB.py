@@ -317,6 +317,10 @@ if st.session_state.predictions is not None:
     df = st.session_state.predictions
     def construct_markdown(row):
         return f"{row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}"
+    
+    # Debugging: Print DataFrame columns
+    st.write("DataFrame columns:", df.columns.tolist())
+    
     for index, row in df.iterrows():
         st.markdown(construct_markdown(row))    
 
