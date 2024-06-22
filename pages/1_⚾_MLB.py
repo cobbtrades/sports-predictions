@@ -345,8 +345,8 @@ if st.session_state.predictions is not None:
                                 <figcaption style="text-align: center; color: white;">{row['Home Team']}</figcaption>
                             </figure>
                             <div style="text-align: center; margin-bottom: 20px;">
-                                <b>Predicted Winner:</b> <br>
                                 {row['Predicted Winner']} <br>
+                                <b>Predicted Winner</b> <br>
                                 <b>Confidence:</b> {row['Confidence']}% <br>
                                 <b>Home Pitcher:</b> {row['Home Pitcher']} <br>
                                 <b>Away Pitcher:</b> {row['Away Pitcher']} <br>
