@@ -359,8 +359,14 @@ if st.session_state.predictions is not None:
                 st.error(f"Error loading team logos: {e}")
                 return f"{row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}"
 
+        col1, col2, col3 = st.columns(3)
         for index, row in df.iterrows():
-            st.markdown(construct_markdown(row), unsafe_allow_html=True)
+            if index % 3 == 0:
+                col1.markdown(construct_markdown(row), unsafe_allow_html=True)
+            elif index % 3 == 1:
+                col2.markdown(construct_markdown(row), unsafe_allow_html=True)
+            else:
+                col3.markdown(construct_markdown(row), unsafe_allow_html=True)
     with rc:
         st.markdown(f"""<div style="text-align: center;"><h3>Highest Confidence Prediction</h3></div>""", unsafe_allow_html=True)
         highest_confidence_game = get_highest_confidence_game(st.session_state.todaygames)
