@@ -304,15 +304,15 @@ if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
     
     # Interactive Chart Example using Altair
-    chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
-        x='Matchup',
-        y='Winner Odds',
-        color='Predicted Winner'
-    ).properties(
-        width=600,
-        height=400
-    )
-    st.altair_chart(chart, use_container_width=True)
+    #chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
+    #    x='Matchup',
+    #    y='Winner Odds',
+    #    color='Predicted Winner'
+    #).properties(
+    #    width=600,
+    #    height=400
+    #)
+    #st.altair_chart(chart, use_container_width=True)
     
     df = st.session_state.predictions
     def construct_markdown(row):
