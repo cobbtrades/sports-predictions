@@ -304,30 +304,24 @@ if st.session_state.predictions is not None:
     st.markdown("### Today's Game Predictions")
     
     # Interactive Chart Example using Altair
-    #chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
-    #    x='Matchup',
-    #    y='Winner Odds',
-    #    color='Predicted Winner'
-    #).properties(
-    #    width=600,
-    #    height=400
-    #)
-    #st.altair_chart(chart, use_container_width=True)
-    
-    df = st.session_state.predictions
-    def construct_markdown(row):
-        return f"{row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}"
-    
-    # Debugging: Print DataFrame columns
-    st.write("DataFrame columns:", df.columns.tolist())
-    
-    for index, row in df.iterrows():
-        st.markdown(construct_markdown(row))    
+    chart = alt.Chart(st.session_state.predictions).mark_bar().encode(
+        x='Matchup',
+        y='Winner Odds',
+        color='Predicted Winner'
+    ).properties(
+        width=600,
+        height=400
+    )
+    st.altair_chart(chart, use_container_width=True)
 
     lc, rc = st.columns([3,1])
     with lc:
         st.markdown("### Today's Game Predictions")
-        st.markdown(styled_html, unsafe_allow_html=True)
+        df = st.session_state.predictions
+        def construct_markdown(row):
+            return f"{row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}"
+        for index, row in df.iterrows():
+            st.markdown(construct_markdown(row))
     with rc:
         st.markdown(f"""<div style="text-align: center;"><h3>Highest Confidence Prediction</h3></div>""", unsafe_allow_html=True)
         highest_confidence_game = get_highest_confidence_game(st.session_state.todaygames)
