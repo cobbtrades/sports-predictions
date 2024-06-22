@@ -289,6 +289,10 @@ def get_historical_record(df, team1, team2):
     team1_wins = len(matchups[(matchups['Tm'] == team1) & (matchups['R'] > matchups['pR'])]) + len(matchups[(matchups['Opp'] == team1) & (matchups['R'] < matchups['pR'])])
     team2_wins = len(matchups[(matchups['Tm'] == team2) & (matchups['R'] > matchups['pR'])]) + len(matchups[(matchups['Opp'] == team2) & (matchups['R'] < matchups['pR'])])
     return team1_wins, team2_wins
+def svg_to_base64(svg_file_path):
+    with open(svg_file_path, "rb") as svg_file:
+        svg_bytes = svg_file.read()
+        return base64.b64encode(svg_bytes).decode()
 
 if 'predictions' not in st.session_state:
     st.session_state.predictions = None
@@ -337,11 +341,6 @@ if st.session_state.predictions is not None:
         loser_logo_path = f'logos/{team_acronyms[losing_team]}.svg'
 
         try:
-            def svg_to_base64(svg_file_path):
-                with open(svg_file_path, "rb") as svg_file:
-                    svg_bytes = svg_file.read()
-                    return base64.b64encode(svg_bytes).decode()
-
             winner_logo_base64 = svg_to_base64(winner_logo_path.lower())
             loser_logo_base64 = svg_to_base64(loser_logo_path.lower())
 
