@@ -347,7 +347,6 @@ if st.session_state.predictions is not None:
                             <div style="text-align: center; margin-bottom: 20px;">
                                 {row['Predicted Winner']} <br>
                                 <b>Predicted Winner</b> <br>
-                                <b>Confidence:</b> {row['Confidence']}% <br>
                                 <b>Home Pitcher:</b> {row['Home Pitcher']} <br>
                                 <b>Away Pitcher:</b> {row['Away Pitcher']} <br>
                                 <b>Winner Odds:</b> {row['Winner Odds']}
