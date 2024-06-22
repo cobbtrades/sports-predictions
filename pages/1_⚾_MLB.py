@@ -333,8 +333,7 @@ if st.session_state.predictions is not None:
                 return f"""
                     <div style="display: flex; align-items: center;">
                         <img src="data:image/svg+xml;base64,{home_logo_base64}" alt="{row['Home Team']} Logo" style="height: 50px; margin-right: 10px;">
-                        <span>{row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}</span>
-                        <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 50px; margin-left: 10px;">
+                        <span>@ <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 50px; margin-left: 10px;"> | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}</span>
                     </div>
                 """
             except FileNotFoundError as e:
