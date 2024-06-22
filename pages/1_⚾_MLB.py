@@ -322,10 +322,27 @@ if st.session_state.predictions is not None:
     with lc:
         st.markdown("### Today's Game Predictions")
         df = st.session_state.predictions
+
         def construct_markdown(row):
-            return f"{row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}"
+            try:
+                home_logo_path = f'logos/{team_acronyms[row["Home Team"]]}.svg'
+                away_logo_path = f'logos/{team_acronyms[row["Away Team"]]}.svg'
+                home_logo_base64 = svg_to_base64(home_logo_path.lower())
+                away_logo_base64 = svg_to_base64(away_logo_path.lower())
+
+                return f"""
+                    <div style="display: flex; align-items: center;">
+                        <img src="data:image/svg+xml;base64,{home_logo_base64}" alt="{row['Home Team']} Logo" style="height: 50px; margin-right: 10px;">
+                        <span>{row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}</span>
+                        <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 50px; margin-left: 10px;">
+                    </div>
+                """
+            except FileNotFoundError as e:
+                st.error(f"Error loading team logos: {e}")
+                return f"{row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}"
+
         for index, row in df.iterrows():
-            st.markdown(construct_markdown(row))
+            st.markdown(construct_markdown(row), unsafe_allow_html=True)
     with rc:
         st.markdown(f"""<div style="text-align: center;"><h3>Highest Confidence Prediction</h3></div>""", unsafe_allow_html=True)
         highest_confidence_game = get_highest_confidence_game(st.session_state.todaygames)
