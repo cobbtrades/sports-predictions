@@ -318,7 +318,7 @@ if st.session_state.predictions is not None:
     def construct_markdown(row):
         return f"{row['Home Team']} @ {row['Away Team']} | {row['Away Pitcher']} vs {row['Home Pitcher']} | Predicted Winner: {row['Predicted Winner']} | Winner Odds: {row['Winner Odds']}"
     for index, row in df.iterrows():
-    st.markdown(construct_markdown(row))    
+        st.markdown(construct_markdown(row))    
 
     lc, rc = st.columns([3,1])
     with lc:
