@@ -341,7 +341,7 @@ if st.session_state.predictions is not None:
                     <div class="prediction-container">
                         <div style="display: flex; align-items: center; margin-bottom: 15px;">
                             <figure style="margin-right: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                                <img src="data:image/svg+xml;base64,{home_logo_base64}" alt="{row['Home Team']} Logo" style="height: 100px;">
+                                <img src="data:image/svg+xml;base64,{home_logo_base64}" alt="{row['Home Team']} Logo" style="height: 80px;">
                                 <figcaption style="text-align: center; color: white;">{row['Home Team']}</figcaption>
                             </figure>
                             <div style="text-align: center; margin-bottom: 20px;">
@@ -352,7 +352,7 @@ if st.session_state.predictions is not None:
                                 <b>Winner Odds:</b> {row['Winner Odds']}
                             </div>
                             <figure style="margin-left: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                                <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 100px;">
+                                <img src="data:image/svg+xml;base64,{away_logo_base64}" alt="{row['Away Team']} Logo" style="height: 80px;">
                                 <figcaption style="text-align: center; color: white;">{row['Away Team']}</figcaption>
                             </figure>
                         </div>
