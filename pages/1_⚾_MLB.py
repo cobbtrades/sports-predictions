@@ -14,6 +14,7 @@ st.markdown("""
         .stButton>button {background-color: #ffaf42; color: #000000; font-weight: bold; border-radius: 10px;}
         .stButton>button:hover {background-color: #ffcf72; color: #000000;}
         .footer {position: fixed; left: 0; bottom: 0; width: 100%; background-color: #333333; color: white; text-align: center; padding: 10px;}
+        .prediction-container {border: 1px solid #444444; border-radius: 15px; padding: 15px; margin-bottom: 15px;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -373,6 +374,7 @@ if st.session_state.predictions is not None:
                 col2.markdown(construct_markdown(row), unsafe_allow_html=True)
             else:
                 col3.markdown(construct_markdown(row), unsafe_allow_html=True)
+
     with rc:
         st.markdown(f"""<div style="text-align: center;"><h3>Highest Confidence Prediction</h3></div>""", unsafe_allow_html=True)
         highest_confidence_game = get_highest_confidence_game(st.session_state.todaygames)
