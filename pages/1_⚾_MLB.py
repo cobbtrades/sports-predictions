@@ -14,7 +14,7 @@ st.markdown("""
         .stButton>button {background-color: #ffaf42; color: #000000; font-weight: bold; border-radius: 10px;}
         .stButton>button:hover {background-color: #ffcf72; color: #000000;}
         .footer {position: fixed; left: 0; bottom: 0; width: 100%; background-color: #333333; color: white; text-align: center; padding: 10px;}
-        .prediction-container {padding: 5px; margin-bottom: 5px; height:300px}
+        .prediction-container {padding: 15px; margin-bottom: 5px; height:300px; display: flex; align-items: center; justify-content: center;}
     </style>
 """, unsafe_allow_html=True)
 
