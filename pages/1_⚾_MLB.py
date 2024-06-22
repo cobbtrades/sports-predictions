@@ -14,7 +14,7 @@ st.markdown("""
         .stButton>button {background-color: #ffaf42; color: #000000; font-weight: bold; border-radius: 10px;}
         .stButton>button:hover {background-color: #ffcf72; color: #000000;}
         .footer {position: fixed; left: 0; bottom: 0; width: 100%; background-color: #333333; color: white; text-align: center; padding: 10px;}
-        .prediction-container {border: 1px solid #444444; border-radius: 15px; padding: 15px;}
+        .prediction-container {border: 1px solid #444444; border-radius: 15px; padding: 15px; margin-bottom: 5px; height:300px}
     </style>
 """, unsafe_allow_html=True)
 
@@ -366,14 +366,15 @@ if st.session_state.predictions is not None:
                     </div>
                 """
 
-        col1, col2, col3 = st.columns(3)
-        for index, row in df.iterrows():
-            if index % 3 == 0:
-                col1.markdown(construct_markdown(row), unsafe_allow_html=True)
-            elif index % 3 == 1:
-                col2.markdown(construct_markdown(row), unsafe_allow_html=True)
-            else:
-                col3.markdown(construct_markdown(row), unsafe_allow_html=True)
+        cols = st.columns(3)
+        num_predictions = len(df)
+        num_rows = min(6, (num_predictions + 2) // 3)  # Calculate number of rows needed, max 6
+        idx = 0
+        for row in range(num_rows):
+            for col in cols:
+                if idx < num_predictions:
+                    col.markdown(construct_markdown(df.iloc[idx]), unsafe_allow_html=True)
+                idx += 1
 
     with rc:
         st.markdown(f"""<div style="text-align: center;"><h3>Highest Confidence Prediction</h3></div>""", unsafe_allow_html=True)
