@@ -294,8 +294,7 @@ def generate_predictions():
     display_df['Winner Odds'] = display_df['Winner Odds'].astype(float).astype(int)
     return display_df, todays_games, df
 
-st.header('Welcome to the MLB Predictions Page')
-st.subheader('Generate Predictions for Today\'s Games')
+st.header('Generate Predictions for Today\'s Games')
 
 def get_highest_confidence_game(todays_games):
     max_confidence_idx = todays_games['Confidence'].idxmax()
