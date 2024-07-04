@@ -3,6 +3,13 @@ from datetime import datetime, timedelta
 from streamlit_extras.badges import badge
 
 st.set_page_config(page_title="Cobb's MLB Predictions", page_icon="⚾", layout="wide", initial_sidebar_state="expanded")
+hide_menu_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    </style>
+"""
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 st.markdown("""
     <style>
         body {background-color: #1e1e1e; color: #ffffff; font-family: 'Arial', sans-serif;}
