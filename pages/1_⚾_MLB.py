@@ -23,7 +23,7 @@ hide_menu_style = """
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     .viewerBadge_link__1S137 {visibility: hidden;}
-    .stActionCutton {visibility: hidden;}
+    .stActionButton {visibility: hidden;}
     </style>
 """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
