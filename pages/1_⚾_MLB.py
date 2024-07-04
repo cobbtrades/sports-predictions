@@ -2,7 +2,7 @@ import requests, pandas as pd, time, numpy as np, pickle, re, json, streamlit as
 from datetime import datetime, timedelta
 from streamlit_extras.badges import badge
 
-st.set_page_config(page_title="Cobb's MLB Predictions", page_icon="💰", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Cobb's MLB Predictions", page_icon="⚾", layout="wide", initial_sidebar_state="expanded")
 st.markdown("""
     <style>
         body {background-color: #1e1e1e; color: #ffffff; font-family: 'Arial', sans-serif;}
