@@ -3,14 +3,6 @@ from datetime import datetime, timedelta
 from streamlit_extras.badges import badge
 
 st.set_page_config(page_title="Cobb's MLB Predictions", page_icon="⚾", layout="wide", initial_sidebar_state="expanded")
-hide_menu_style = """
-    <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    .viewerBadge_link__1S137 {visibility: hidden;}
-    </style>
-"""
-st.markdown(hide_menu_style, unsafe_allow_html=True)
 st.markdown("""
     <style>
         body {background-color: #1e1e1e; color: #ffffff; font-family: 'Arial', sans-serif;}
@@ -25,6 +17,15 @@ st.markdown("""
         .prediction-container {padding: 15px; margin-bottom: 5px; height:300px; display: flex; align-items: center; justify-content: center;}
     </style>
 """, unsafe_allow_html=True)
+
+hide_menu_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    .viewerBadge_link__1S137 {visibility: hidden;}
+    </style>
+"""
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 def buymeacoffee():
     badge(type="buymeacoffee", name="cobbtradesg")
