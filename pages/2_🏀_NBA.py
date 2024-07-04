@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_extras.badges import badge
 
-st.set_page_config(page_title="NFL Predictions", layout="wide")
+st.set_page_config(page_title="Cobb's NBA Predictions", page_icon="🏀", layout="wide", initial_sidebar_state="expanded")
 
 st.title("NBA Predictions")
 def buymeacoffee():
